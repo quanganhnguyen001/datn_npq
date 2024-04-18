@@ -1,4 +1,6 @@
+import 'package:datn_npq/cubit/music/music_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart' as rxdart;
@@ -16,21 +18,21 @@ class SongScreen extends StatefulWidget {
 
 class _SongScreenState extends State<SongScreen> {
   AudioPlayer audioPlayer = AudioPlayer();
+  List<AudioSource> listAudioSource = [];
 
   @override
   void initState() {
+    listAudioSource.add(AudioSource.uri(Uri.parse(widget.song.url ?? '')));
+    for (var i in context.read<MusicCubit>().state.songList) {
+      if (i.url != widget.song.url) {
+        listAudioSource.add(AudioSource.uri(Uri.parse(i.url ?? '')));
+      }
+    }
+
     super.initState();
 
     audioPlayer.setAudioSource(
-      ConcatenatingAudioSource(
-        children: [
-          AudioSource.uri(
-            Uri.parse('asset:///${widget.song.url}'),
-          ),
-          AudioSource.asset(
-              'assets/audio/ChungTaCuaTuongLai-SonTungMTP-14032595.mp3')
-        ],
-      ),
+      ConcatenatingAudioSource(children: listAudioSource),
     );
   }
 
@@ -56,6 +58,7 @@ class _SongScreenState extends State<SongScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Container(),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -63,8 +66,8 @@ class _SongScreenState extends State<SongScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-            widget.song.coverUrl,
+          Image.network(
+            widget.song.coverUrl ?? '',
             fit: BoxFit.cover,
           ),
           const _BackgroundFilter(),
@@ -104,7 +107,7 @@ class _MusicPlayer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            song.title,
+            song.title ?? '',
             style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -112,7 +115,7 @@ class _MusicPlayer extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            song.description,
+            song.description ?? '',
             maxLines: 2,
             style: Theme.of(context)
                 .textTheme

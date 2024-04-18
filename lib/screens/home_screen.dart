@@ -1,8 +1,9 @@
 import 'package:datn_npq/auth/base_screen.dart';
 import 'package:datn_npq/screens/favorite_screen.dart';
 import 'package:datn_npq/screens/music_screen.dart';
-import 'package:datn_npq/screens/my_playlist_screen.dart';
+
 import 'package:datn_npq/screens/profile_screen.dart';
+import 'package:datn_npq/screens/update_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
             FavoriteSCreen(
                 // user: userState.user ?? const UserModel(),
                 ),
-            const MyPlayList(),
             ProfileScreen(
               user: state.user ?? const UserModel(),
             ),
@@ -62,9 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ? 'Quân MP3'
                       : currentIndex == 1
                           ? 'Danh sách yêu thích'
-                          : currentIndex == 2
-                              ? 'PlayList của tôi'
-                              : 'Thông tin tài khoản',
+                          : 'Thông tin tài khoản',
                   style: TextStyle(color: Colors.white),
                 ),
                 backgroundColor: Colors.transparent,
@@ -77,6 +75,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           position: RelativeRect.fromLTRB(100, 50, 0, 0),
                           items: [
                             PopupMenuItem(
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => UpdateProfileScreen(
+                                          user: state.user ?? UserModel())));
+                                },
                                 child: Text('Cập nhật thông tin tài khoản')),
                             PopupMenuItem(
                                 onTap: () {
@@ -116,10 +119,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   BottomNavigationBarItem(
                     icon: Icon(Icons.favorite_outline),
                     label: 'Favorites',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.list),
-                    label: '',
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.person),

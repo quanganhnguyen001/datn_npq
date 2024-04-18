@@ -1,6 +1,9 @@
 import 'package:datn_npq/auth/base_screen.dart';
 import 'package:datn_npq/cubit/login/login_cubit.dart';
+import 'package:datn_npq/screens/admin/admin_screen.dart';
+import 'package:datn_npq/screens/forgot_password_screen.dart';
 import 'package:datn_npq/screens/sign_up_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -136,9 +139,15 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: 20,
               ),
-              Container(
-                color: Colors.blue,
-                child: Text('Quên mật khẩu'),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => ForgotPasswordScreen()));
+                },
+                child: Container(
+                  color: Colors.blue,
+                  child: Text('Quên mật khẩu'),
+                ),
               ),
               SizedBox(
                 height: 20,
@@ -158,6 +167,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               'admin' &&
                           context.read<LoginCubit>().passwordController.text ==
                               'admin') {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => AdminScreen()));
                         // Navigator.of(context).pushNamedAndRemoveUntil(
                         //     AdminScreen.routeName, (route) => false);
                       }

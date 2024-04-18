@@ -1,34 +1,57 @@
+import 'dart:convert';
+
 import 'song_model.dart';
 
 class Playlist {
-  final String title;
-  final List<Song> songs;
-  final String imageUrl;
+  final String? title;
+  final List<Song>? songs;
+  final String? imageUrl;
+  final String? playlistId;
 
   Playlist({
-    required this.title,
-    required this.songs,
-    required this.imageUrl,
+    this.title,
+    this.songs,
+    this.imageUrl,
+    this.playlistId,
   });
 
-  static List<Playlist> playlists = [
-    Playlist(
-      title: 'Hip-hop R&B Mix',
-      songs: Song.songs,
-      imageUrl:
-          'https://images.unsplash.com/photo-1576525865260-9f0e7cfb02b3?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1364&q=80',
-    ),
-    Playlist(
-      title: 'Rock & Roll',
-      songs: Song.songs,
-      imageUrl:
-          'https://images.unsplash.com/photo-1629276301820-0f3eedc29fd0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2848&q=80',
-    ),
-    Playlist(
-      title: 'Techno',
-      songs: Song.songs,
-      imageUrl:
-          'https://images.unsplash.com/photo-1594623930572-300a3011d9ae?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2670&q=80',
-    )
-  ];
+  Map<String, dynamic> toMap() {
+    final result = <String, dynamic>{};
+
+    if (title != null) {
+      result.addAll({'title': title});
+    }
+    if (songs != null) {
+      result.addAll({'songs': songs!.map((x) => x?.toMap()).toList()});
+    }
+    if (imageUrl != null) {
+      result.addAll({'imageUrl': imageUrl});
+    }
+    if (playlistId != null) {
+      result.addAll({'playlistId': playlistId});
+    }
+
+    return result;
+  }
+
+  factory Playlist.fromMap(Map<String, dynamic> map) {
+    return Playlist(
+      title: map['title'],
+      songs: map['songs'] != null
+          ? List<Song>.from(map['songs']?.map((x) => Song.fromMap(x)))
+          : null,
+      imageUrl: map['imageUrl'],
+      playlistId: map['playlistId'],
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Playlist.fromJson(String source) =>
+      Playlist.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'Playlist(title: $title, songs: $songs, imageUrl: $imageUrl, playlistId: $playlistId)';
+  }
 }

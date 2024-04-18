@@ -1,9 +1,13 @@
+import 'package:datn_npq/cubit/forgot_password/forgot_password_cubit.dart';
 import 'package:datn_npq/cubit/login/login_cubit.dart';
+import 'package:datn_npq/cubit/music/music_cubit.dart';
 import 'package:datn_npq/cubit/signup/signup_cubit.dart';
+import 'package:datn_npq/cubit/update_profile/update_profile_cubit.dart';
+import 'package:datn_npq/cubit/upload_song/upload_song_cubit.dart';
+import 'package:datn_npq/screens/admin/widget/upload_song_widget.dart';
 
-import 'package:datn_npq/screens/home_screen.dart';
-import 'package:datn_npq/screens/login_screen.dart';
 import 'package:datn_npq/screens/splash_screen.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,6 +39,18 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider<LoginCubit>(
             create: (context) => LoginCubit(),
+          ),
+          BlocProvider<UpdateProfileCubit>(
+            create: (context) => UpdateProfileCubit(),
+          ),
+          BlocProvider<ForgotPasswordCubit>(
+            create: (context) => ForgotPasswordCubit(),
+          ),
+          BlocProvider<UploadSongCubit>(
+            create: (context) => UploadSongCubit()..fetchData(),
+          ),
+          BlocProvider<MusicCubit>(
+            create: (context) => MusicCubit()..fetchData(),
           ),
           BlocProvider<UserCubit>(
             create: (context) => UserCubit()..loadUserData(),

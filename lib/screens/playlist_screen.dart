@@ -1,14 +1,19 @@
+import 'package:datn_npq/cubit/music/music_cubit.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../models/playlist_model.dart';
 
 class PlaylistScreen extends StatelessWidget {
-  const PlaylistScreen({Key? key}) : super(key: key);
+  const PlaylistScreen({Key? key, required this.index, required this.title})
+      : super(key: key);
+  final int index;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
-    Playlist playlist = Playlist.playlists[0];
-
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -25,17 +30,22 @@ class PlaylistScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: const Text('Playlist'),
+          centerTitle: true,
+          leading: Container(),
+          title: Text(title),
         ),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: [
-                _PlaylistInformation(playlist: playlist),
+                _PlaylistInformation(
+                  index: index,
+                ),
                 const SizedBox(height: 30),
-                const _PlayOrShuffleSwitch(),
-                _PlaylistSongs(playlist: playlist),
+                _PlaylistSongs(
+                  index: index,
+                ),
               ],
             ),
           ),
@@ -45,41 +55,100 @@ class PlaylistScreen extends StatelessWidget {
   }
 }
 
-class _PlaylistSongs extends StatelessWidget {
+class _PlaylistSongs extends StatefulWidget {
   const _PlaylistSongs({
     Key? key,
-    required this.playlist,
+    required this.index,
   }) : super(key: key);
-
-  final Playlist playlist;
+  final int index;
 
   @override
+  State<_PlaylistSongs> createState() => _PlaylistSongsState();
+}
+
+class _PlaylistSongsState extends State<_PlaylistSongs> {
+  bool hovering = false;
+  @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: playlist.songs.length,
-      itemBuilder: (context, index) {
-        return ListTile(
-          leading: Text(
-            '${index + 1}',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(fontWeight: FontWeight.bold),
-          ),
-          title: Text(
-            playlist.songs[index].title,
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge!
-                .copyWith(fontWeight: FontWeight.bold),
-          ),
-          subtitle: Text('${playlist.songs[index].description} ⚬ 02:45'),
-          trailing: const Icon(
-            Icons.more_vert,
-            color: Colors.white,
-          ),
+    return BlocBuilder<MusicCubit, MusicState>(
+      builder: (context, state) {
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: state.playList[widget.index].songs?.length,
+          itemBuilder: (context, index1) {
+            return ListTile(
+              leading: SizedBox(
+                width: 100,
+                child: Row(
+                  children: [
+                    Text(
+                      '${widget.index + 1}',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      width: 15,
+                    ),
+                    MouseRegion(
+                      onEnter: (_) {
+                        setState(() {
+                          hovering = true;
+                        });
+                      },
+                      onExit: (_) {
+                        setState(() {
+                          hovering = false;
+                        });
+                      },
+                      child: Stack(
+                        children: [
+                          Image.network(state.playList[widget.index]
+                                  .songs?[index1].coverUrl ??
+                              ''),
+                          AnimatedOpacity(
+                            duration: Duration(milliseconds: 200),
+                            opacity: hovering ? 1.0 : 0.0,
+                            child: Container(
+                              width: 70,
+                              color: Colors.black.withOpacity(
+                                  0.5), // Adjust the color and opacity here
+                              child: Center(
+                                child: GestureDetector(
+                                  onTap: () {},
+                                  child: Icon(
+                                    Icons
+                                        .play_circle_fill, // Replace with your icon
+
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              title: Text(
+                state.playList[widget.index].songs?[index1].title ?? '',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                  '${state.playList[widget.index].songs?[index1].description}'),
+              trailing: const Icon(
+                Icons.more_vert,
+                color: Colors.white,
+              ),
+            );
+          },
         );
       },
     );
@@ -185,33 +254,36 @@ class _PlayOrShuffleSwitchState extends State<_PlayOrShuffleSwitch> {
 class _PlaylistInformation extends StatelessWidget {
   const _PlaylistInformation({
     Key? key,
-    required this.playlist,
+    required this.index,
   }) : super(key: key);
-
-  final Playlist playlist;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(15.0),
-          child: Image.network(
-            playlist.imageUrl,
-            height: MediaQuery.of(context).size.height * 0.3,
-            width: MediaQuery.of(context).size.height * 0.3,
-            fit: BoxFit.cover,
-          ),
-        ),
-        const SizedBox(height: 30),
-        Text(
-          playlist.title,
-          style: Theme.of(context)
-              .textTheme
-              .headlineSmall!
-              .copyWith(fontWeight: FontWeight.bold),
-        ),
-      ],
+    return BlocBuilder<MusicCubit, MusicState>(
+      builder: (context, state) {
+        return Column(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15.0),
+              child: Image.network(
+                state.playList[index].imageUrl ?? '',
+                height: MediaQuery.of(context).size.height * 0.3,
+                width: MediaQuery.of(context).size.height * 0.3,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(height: 30),
+            Text(
+              state.playList[index].title ?? '',
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineSmall!
+                  .copyWith(fontWeight: FontWeight.bold),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -7,17 +7,16 @@ class PlaylistCard extends StatelessWidget {
   const PlaylistCard({
     Key? key,
     required this.playlist,
+    required this.onTap,
   }) : super(key: key);
 
   final Playlist playlist;
+  final Function() onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => PlaylistScreen()));
-      },
+      onTap: onTap,
       child: Container(
         height: 75,
         margin: const EdgeInsets.only(bottom: 10),
@@ -32,7 +31,7 @@ class PlaylistCard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(15.0),
               child: Image.network(
-                playlist.imageUrl,
+                playlist.imageUrl ?? '',
                 height: 50,
                 width: 50,
                 fit: BoxFit.cover,
@@ -45,14 +44,14 @@ class PlaylistCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    playlist.title,
+                    playlist.title ?? '',
                     style: Theme.of(context)
                         .textTheme
                         .bodyLarge!
                         .copyWith(fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    '${playlist.songs.length} songs',
+                    '${playlist.songs?.length} songs',
                     maxLines: 2,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),

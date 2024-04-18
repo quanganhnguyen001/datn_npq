@@ -1,10 +1,16 @@
 import 'package:datn_npq/auth/model/user_model.dart';
+import 'package:datn_npq/cubit/music/music_cubit.dart';
 import 'package:datn_npq/models/playlist_model.dart';
 import 'package:datn_npq/models/song_model.dart';
+import 'package:datn_npq/screens/playlist_screen.dart';
+import 'package:datn_npq/screens/song_screen.dart';
 import 'package:datn_npq/widgets/playlist_card.dart';
 import 'package:datn_npq/widgets/section_header.dart';
 import 'package:datn_npq/widgets/song_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../cubit/user/user_cubit.dart';
 
 class MusicScreen extends StatefulWidget {
   const MusicScreen({super.key, required this.user});
@@ -15,8 +21,13 @@ class MusicScreen extends StatefulWidget {
 }
 
 class _MusicScreenState extends State<MusicScreen> {
-  List<Song> songs = Song.songs;
-  List<Playlist> playlists = Playlist.playlists;
+  @override
+  void initState() {
+    context.read<UserCubit>().loadUserData();
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,11 +99,17 @@ class _MusicScreenState extends State<MusicScreen> {
                     const SizedBox(height: 20),
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.27,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: songs.length,
-                        itemBuilder: (context, index) {
-                          return SongCard(song: songs[index]);
+                      child: BlocBuilder<MusicCubit, MusicState>(
+                        builder: (context, state) {
+                          return ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: state.songList.length,
+                            itemBuilder: (context, index) {
+                              return SongCard(
+                                song: state.songList[index],
+                              );
+                            },
+                          );
                         },
                       ),
                     ),
@@ -104,14 +121,28 @@ class _MusicScreenState extends State<MusicScreen> {
                 child: Column(
                   children: [
                     const SectionHeader(title: 'Thể loại'),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.only(top: 20),
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: playlists.length,
-                      itemBuilder: ((context, index) {
-                        return PlaylistCard(playlist: playlists[index]);
-                      }),
+                    BlocBuilder<MusicCubit, MusicState>(
+                      builder: (context, state) {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.only(top: 20),
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: state.playList.length,
+                          itemBuilder: ((context, index) {
+                            return PlaylistCard(
+                              playlist: state.playList[index],
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => PlaylistScreen(
+                                          index: index,
+                                          title:
+                                              state.playList[index].title ?? '',
+                                        )));
+                              },
+                            );
+                          }),
+                        );
+                      },
                     ),
                   ],
                 ),
