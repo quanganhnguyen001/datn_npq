@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:datn_npq/cubit/upload_song/upload_song_cubit.dart';
 import 'package:datn_npq/screens/admin/widget/upload_playlist_widget.dart';
 import 'package:datn_npq/screens/admin/widget/upload_song_widget.dart';
@@ -80,6 +81,12 @@ class AdminScreen extends StatelessWidget {
                       return PlaylistCard(
                         playlist: state.playList[index],
                         onTap: () {},
+                        onPressed: () async {
+                          await FirebaseFirestore.instance
+                              .collection('playlist')
+                              .doc(state.playList[index].playlistId)
+                              .delete();
+                        },
                       );
                     }),
                   ),
@@ -127,6 +134,25 @@ class AdminScreen extends StatelessWidget {
                                         Theme.of(context).textTheme.bodySmall,
                                   ),
                                 ],
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {},
+                              icon: const Icon(
+                                Icons.edit,
+                                color: Colors.green,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () async {
+                                await FirebaseFirestore.instance
+                                    .collection('song')
+                                    .doc(state.songList[index].songId)
+                                    .delete();
+                              },
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
                               ),
                             ),
                           ],

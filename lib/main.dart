@@ -4,6 +4,7 @@ import 'package:datn_npq/cubit/music/music_cubit.dart';
 import 'package:datn_npq/cubit/signup/signup_cubit.dart';
 import 'package:datn_npq/cubit/update_profile/update_profile_cubit.dart';
 import 'package:datn_npq/cubit/upload_song/upload_song_cubit.dart';
+import 'package:datn_npq/screens/admin/admin_screen.dart';
 import 'package:datn_npq/screens/admin/widget/upload_song_widget.dart';
 
 import 'package:datn_npq/screens/splash_screen.dart';

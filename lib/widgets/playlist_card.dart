@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:datn_npq/screens/playlist_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -8,10 +9,12 @@ class PlaylistCard extends StatelessWidget {
     Key? key,
     required this.playlist,
     required this.onTap,
+    this.onPressed,
   }) : super(key: key);
 
   final Playlist playlist;
   final Function() onTap;
+  final Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -61,8 +64,15 @@ class PlaylistCard extends StatelessWidget {
             IconButton(
               onPressed: () {},
               icon: const Icon(
-                Icons.play_circle,
-                color: Colors.white,
+                Icons.edit,
+                color: Colors.green,
+              ),
+            ),
+            IconButton(
+              onPressed: onPressed,
+              icon: const Icon(
+                Icons.delete,
+                color: Colors.red,
               ),
             ),
           ],
