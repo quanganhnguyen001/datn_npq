@@ -131,6 +131,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                                     child: GestureDetector(
                                                       onTap: () {
                                                         setState(() {
+                                                          indexPlaying = index1;
                                                           audioPlayer
                                                               .setAudioSource(
                                                             ConcatenatingAudioSource(
@@ -139,12 +140,12 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                                                           .playList[widget
                                                                               .index]
                                                                           .songs?[
-                                                                              index1]
+                                                                              indexPlaying]
                                                                           .url ??
                                                                       ''))
                                                                 ]),
                                                           );
-                                                          indexPlaying = index1;
+
                                                           isPlaying = true;
                                                           // audioUrl = state
                                                           //     .playList[
@@ -269,9 +270,29 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                               audioPlayer.sequenceStateStream,
                                           builder: (context, index) {
                                             return IconButton(
-                                              onPressed: audioPlayer.hasPrevious
-                                                  ? audioPlayer.seekToPrevious
-                                                  : null,
+                                              onPressed: () {
+                                                setState(() {
+                                                  indexPlaying =
+                                                      indexPlaying - 1;
+                                                  audioPlayer.setAudioSource(
+                                                    ConcatenatingAudioSource(
+                                                        children: [
+                                                          AudioSource.uri(
+                                                              Uri.parse(state
+                                                                      .playList[
+                                                                          widget
+                                                                              .index]
+                                                                      .songs?[
+                                                                          indexPlaying]
+                                                                      .url ??
+                                                                  ''))
+                                                        ]),
+                                                  );
+                                                });
+                                              },
+                                              // onPressed: audioPlayer.hasPrevious
+                                              //     ? audioPlayer.seekToPrevious
+                                              //     : null,
                                               iconSize: 25,
                                               icon: const Icon(
                                                 Icons.skip_previous,
@@ -345,9 +366,29 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                               audioPlayer.sequenceStateStream,
                                           builder: (context, index) {
                                             return IconButton(
-                                              onPressed: audioPlayer.hasNext
-                                                  ? audioPlayer.seekToNext
-                                                  : null,
+                                              onPressed: () {
+                                                setState(() {
+                                                  indexPlaying =
+                                                      indexPlaying + 1;
+                                                  audioPlayer.setAudioSource(
+                                                    ConcatenatingAudioSource(
+                                                        children: [
+                                                          AudioSource.uri(
+                                                              Uri.parse(state
+                                                                      .playList[
+                                                                          widget
+                                                                              .index]
+                                                                      .songs?[
+                                                                          indexPlaying]
+                                                                      .url ??
+                                                                  ''))
+                                                        ]),
+                                                  );
+                                                });
+                                              },
+                                              // onPressed: audioPlayer.hasNext
+                                              //     ? audioPlayer.seekToNext
+                                              //     : null,
                                               iconSize: 25,
                                               icon: const Icon(
                                                 Icons.skip_next,
