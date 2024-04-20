@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:datn_npq/screens/playlist_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../models/playlist_model.dart';
@@ -61,20 +62,24 @@ class PlaylistCard extends StatelessWidget {
                 ],
               ),
             ),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.edit,
-                color: Colors.green,
-              ),
-            ),
-            IconButton(
-              onPressed: onPressed,
-              icon: const Icon(
-                Icons.delete,
-                color: Colors.red,
-              ),
-            ),
+            FirebaseAuth.instance.currentUser == null
+                ? IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.edit,
+                      color: Colors.green,
+                    ),
+                  )
+                : Container(),
+            FirebaseAuth.instance.currentUser == null
+                ? IconButton(
+                    onPressed: onPressed,
+                    icon: const Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
+                  )
+                : Container(),
           ],
         ),
       ),

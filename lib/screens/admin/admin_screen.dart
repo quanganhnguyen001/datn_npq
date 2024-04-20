@@ -4,6 +4,7 @@ import 'package:datn_npq/screens/admin/widget/upload_playlist_widget.dart';
 import 'package:datn_npq/screens/admin/widget/upload_song_widget.dart';
 import 'package:datn_npq/widgets/playlist_card.dart';
 import 'package:datn_npq/widgets/song_card.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -136,25 +137,29 @@ class AdminScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.edit,
-                                color: Colors.green,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () async {
-                                await FirebaseFirestore.instance
-                                    .collection('song')
-                                    .doc(state.songList[index].songId)
-                                    .delete();
-                              },
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Colors.red,
-                              ),
-                            ),
+                            FirebaseAuth.instance.currentUser == null
+                                ? IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.edit,
+                                      color: Colors.green,
+                                    ),
+                                  )
+                                : Container(),
+                            FirebaseAuth.instance.currentUser == null
+                                ? IconButton(
+                                    onPressed: () async {
+                                      await FirebaseFirestore.instance
+                                          .collection('song')
+                                          .doc(state.songList[index].songId)
+                                          .delete();
+                                    },
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                  )
+                                : Container(),
                           ],
                         ),
                       );

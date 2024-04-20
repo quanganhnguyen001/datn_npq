@@ -28,6 +28,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   AudioPlayer audioPlayer = AudioPlayer();
   int indexPlaying = 0;
   bool hovering = false;
+  bool isFavorite = false;
   bool isPlaying = false;
 
   Stream<SeekBarData> get _seekBarDataStream =>
@@ -181,9 +182,18 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                   ),
                                   subtitle: Text(
                                       '${state.playList[widget.index].songs?[index1].description}'),
-                                  trailing: const Icon(
-                                    Icons.more_vert,
-                                    color: Colors.white,
+                                  trailing: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        isFavorite = !isFavorite;
+                                      });
+                                    },
+                                    child: Icon(
+                                      Icons.favorite,
+                                      color: isFavorite == true
+                                          ? Colors.red
+                                          : Colors.white,
+                                    ),
                                   ),
                                 );
                               },
