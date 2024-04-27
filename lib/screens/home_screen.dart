@@ -36,8 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
               user: state.user ?? const UserModel(),
             ),
             FavoriteSCreen(
-                // user: userState.user ?? const UserModel(),
-                ),
+              userModel: state.user ?? const UserModel(),
+            ),
             ProfileScreen(
               user: state.user ?? const UserModel(),
             ),

@@ -11,12 +11,13 @@ class PlaylistCard extends StatelessWidget {
     required this.playlist,
     required this.onTap,
     this.onPressed,
+    this.onPressedEdit,
   }) : super(key: key);
 
   final Playlist playlist;
   final Function() onTap;
   final Function()? onPressed;
-
+  final Function()? onPressedEdit;
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -64,7 +65,7 @@ class PlaylistCard extends StatelessWidget {
             ),
             FirebaseAuth.instance.currentUser == null
                 ? IconButton(
-                    onPressed: () {},
+                    onPressed: onPressedEdit,
                     icon: const Icon(
                       Icons.edit,
                       color: Colors.green,

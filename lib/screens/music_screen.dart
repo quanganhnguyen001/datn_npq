@@ -134,6 +134,7 @@ class _MusicScreenState extends State<MusicScreen> {
                               onTap: () {
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => PlaylistScreen(
+                                          userModel: widget.user,
                                           index: index,
                                           title:
                                               state.playList[index].title ?? '',

@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:datn_npq/cubit/upload_song/upload_song_cubit.dart';
+import 'package:datn_npq/screens/admin/widget/update_playlist.dart';
+import 'package:datn_npq/screens/admin/widget/update_song.dart';
 import 'package:datn_npq/screens/admin/widget/upload_playlist_widget.dart';
 import 'package:datn_npq/screens/admin/widget/upload_song_widget.dart';
 import 'package:datn_npq/widgets/playlist_card.dart';
@@ -82,6 +84,11 @@ class AdminScreen extends StatelessWidget {
                       return PlaylistCard(
                         playlist: state.playList[index],
                         onTap: () {},
+                        onPressedEdit: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => UpdatePlaylist(
+                                  playlist: state.playList[index])));
+                        },
                         onPressed: () async {
                           await FirebaseFirestore.instance
                               .collection('playlist')
@@ -139,7 +146,13 @@ class AdminScreen extends StatelessWidget {
                             ),
                             FirebaseAuth.instance.currentUser == null
                                 ? IconButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                              builder: (context) => UpdateSong(
+                                                    song: state.songList[index],
+                                                  )));
+                                    },
                                     icon: const Icon(
                                       Icons.edit,
                                       color: Colors.green,

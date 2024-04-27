@@ -2,12 +2,15 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 
+import 'package:datn_npq/models/song_model.dart';
+
 class UserModel extends Equatable {
   final String? uid;
   final String? name;
   final String? email;
   final String? imageUrl;
   final String? phone;
+  final List<Song>? favoriteSong;
 
   const UserModel({
     this.uid,
@@ -15,10 +18,11 @@ class UserModel extends Equatable {
     this.email,
     this.imageUrl,
     this.phone,
+    this.favoriteSong,
   });
 
   @override
-  List<Object?> get props => [uid, name, imageUrl, phone, email];
+  List<Object?> get props => [uid, name, imageUrl, phone, email, favoriteSong];
 
   Map<String, dynamic> toMap() {
     final result = <String, dynamic>{};
@@ -38,6 +42,10 @@ class UserModel extends Equatable {
     if (phone != null) {
       result.addAll({'phone': phone});
     }
+    if (favoriteSong != null) {
+      result.addAll(
+          {'favoriteSong': favoriteSong!.map((x) => x.toMap()).toList()});
+    }
 
     return result;
   }
@@ -49,6 +57,9 @@ class UserModel extends Equatable {
       email: map['email'],
       imageUrl: map['imageUrl'],
       phone: map['phone'],
+      favoriteSong: map['favoriteSong'] != null
+          ? List<Song>.from(map['favoriteSong']?.map((x) => Song.fromMap(x)))
+          : null,
     );
   }
 

@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:datn_npq/models/song_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -26,11 +27,18 @@ class UserCubit extends Cubit<UserState> {
             .collection('users')
             .doc(user!.uid)
             .get();
+        var songs = userSnapshot['favoriteSong'];
+        List<Song> favoriteSongs = [];
+        if (songs != null) {
+          favoriteSongs = List<Song>.from(songs
+              .map((songMap) => Song.fromMap(songMap as Map<String, dynamic>)));
+        }
         return UserModel(
           imageUrl: userSnapshot['imageUrl'],
           name: userSnapshot['name'],
           email: userSnapshot['email'],
           phone: userSnapshot['phone'],
+          favoriteSong: favoriteSongs,
         );
       }
     } catch (e) {

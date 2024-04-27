@@ -1,24 +1,27 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:datn_npq/auth/model/user_model.dart';
 import 'package:datn_npq/cubit/music/music_cubit.dart';
 import 'package:datn_npq/models/song_model.dart';
-import 'package:datn_npq/widgets/player_buttons.dart';
+
 import 'package:datn_npq/widgets/seekbar.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart' as rxdart;
-
-import '../models/playlist_model.dart';
 
 class PlaylistScreen extends StatefulWidget {
   const PlaylistScreen({
     Key? key,
     required this.index,
     required this.title,
+    required this.userModel,
   }) : super(key: key);
   final int index;
   final String title;
+  final UserModel userModel;
 
   @override
   State<PlaylistScreen> createState() => _PlaylistScreenState();
@@ -28,7 +31,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   AudioPlayer audioPlayer = AudioPlayer();
   int indexPlaying = 0;
   bool hovering = false;
-  bool isFavorite = false;
+
   bool isPlaying = false;
 
   Stream<SeekBarData> get _seekBarDataStream =>
@@ -99,7 +102,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                               .copyWith(
                                                   fontWeight: FontWeight.bold),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           width: 15,
                                         ),
                                         MouseRegion(
@@ -121,8 +124,8 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                                       .coverUrl ??
                                                   ''),
                                               AnimatedOpacity(
-                                                duration:
-                                                    Duration(milliseconds: 200),
+                                                duration: const Duration(
+                                                    milliseconds: 200),
                                                 opacity: hovering ? 1.0 : 0.0,
                                                 child: Container(
                                                   width: 70,
@@ -155,7 +158,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                                           //     .url;
                                                         });
                                                       },
-                                                      child: Icon(
+                                                      child: const Icon(
                                                         Icons
                                                             .play_circle_fill, // Replace with your icon
 
@@ -184,15 +187,55 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                       '${state.playList[widget.index].songs?[index1].description}'),
                                   trailing: GestureDetector(
                                     onTap: () {
-                                      setState(() {
-                                        isFavorite = !isFavorite;
-                                      });
+                                      if (widget.userModel.favoriteSong!.any(
+                                          (element) =>
+                                              element.title ==
+                                              state.playList[widget.index]
+                                                  .songs?[index1].title)) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                          content: Text(
+                                              'Da co trong danh sach yeu thich'),
+                                          duration: Duration(seconds: 2),
+                                        ));
+                                      } else {
+                                        (widget.userModel.favoriteSong ?? [])
+                                            .add(Song(
+                                          title: state.playList[widget.index]
+                                              .songs?[index1].title,
+                                          url: state.playList[widget.index]
+                                              .songs?[index1].url,
+                                          coverUrl: state.playList[widget.index]
+                                              .songs?[index1].coverUrl,
+                                          description: state
+                                              .playList[widget.index]
+                                              .songs?[index1]
+                                              .description,
+                                          songId: state.playList[widget.index]
+                                              .songs?[index1].songId,
+                                        ));
+
+                                        FirebaseFirestore.instance
+                                            .collection('users')
+                                            .doc(FirebaseAuth
+                                                .instance.currentUser!.uid)
+                                            .update(UserModel(
+                                                    favoriteSong: (widget
+                                                            .userModel
+                                                            .favoriteSong ??
+                                                        []))
+                                                .toMap());
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                          content: Text(
+                                              'Them vao danh sach yeu thich thanh cong'),
+                                          duration: Duration(seconds: 2),
+                                        ));
+                                      }
                                     },
-                                    child: Icon(
-                                      Icons.favorite,
-                                      color: isFavorite == true
-                                          ? Colors.red
-                                          : Colors.white,
+                                    child: const Icon(
+                                      Icons.add,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 );
@@ -234,7 +277,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                       '',
                                   width: 100,
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 15,
                                 ),
                                 Column(
@@ -266,7 +309,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                     ),
                                   ],
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 200,
                                 ),
                                 Column(
@@ -282,8 +325,12 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                             return IconButton(
                                               onPressed: () {
                                                 setState(() {
-                                                  indexPlaying =
-                                                      indexPlaying - 1;
+                                                  if (indexPlaying > 0) {
+                                                    indexPlaying =
+                                                        indexPlaying - 1;
+                                                  } else {
+                                                    return;
+                                                  }
                                                   audioPlayer.setAudioSource(
                                                     ConcatenatingAudioSource(
                                                         children: [
@@ -378,8 +425,20 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                             return IconButton(
                                               onPressed: () {
                                                 setState(() {
-                                                  indexPlaying =
-                                                      indexPlaying + 1;
+                                                  if (indexPlaying !=
+                                                      (state
+                                                                  .playList[
+                                                                      widget
+                                                                          .index]
+                                                                  .songs
+                                                                  ?.length ??
+                                                              0) -
+                                                          1) {
+                                                    indexPlaying =
+                                                        indexPlaying + 1;
+                                                  } else {
+                                                    return;
+                                                  }
                                                   audioPlayer.setAudioSource(
                                                     ConcatenatingAudioSource(
                                                         children: [
