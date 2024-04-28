@@ -22,185 +22,228 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return BaseScreen(builder: (ctx) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text('Đăng Nhập'),
-          centerTitle: true,
-        ),
-        body: Form(
-          key: formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 400),
-                child: TextFormField(
-                  controller: context.read<LoginCubit>().emailController,
-                  style: TextStyle(color: Colors.black),
-                  validator: (value) {
-                    if (!RegExp(
-                            r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
-                        .hasMatch(value ?? 'Email không hợp lệ')) {
-                      return 'Vui lòng nhập email';
-                    }
-
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    disabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: const BorderSide(
-                          color: Color.fromRGBO(190, 186, 179, 1),
-                        )),
-                    focusedErrorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: const BorderSide(
-                          color: Color.fromRGBO(190, 186, 179, 1),
-                        )),
-                    errorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: const BorderSide(
-                          color: Color.fromRGBO(190, 186, 179, 1),
-                        )),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: const BorderSide(
-                          color: Color.fromRGBO(190, 186, 179, 1),
-                        )),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: const BorderSide(
-                          color: Color.fromRGBO(190, 186, 179, 1),
-                        )),
-                    contentPadding: EdgeInsets.only(left: 16),
-                    border: InputBorder.none,
-                    hintText: 'Nhập email của bạn',
-                  ),
-                ),
+        body: Stack(
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Image.asset(
+                'assets/images/auth_bg.jpg',
+                fit: BoxFit.fill,
               ),
-              SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 400),
-                child: TextFormField(
-                  controller: context.read<LoginCubit>().passwordController,
-                  style: TextStyle(color: Colors.black),
-                  obscureText: isShow,
-                  validator: (value) {
-                    if (!RegExp(r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$")
-                        .hasMatch(value ?? 'Mật khẩu không hợp lệ')) {
-                      return 'Vui lòng nhập mật khẩu';
-                    }
-
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    disabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: const BorderSide(
-                          color: Color.fromRGBO(190, 186, 179, 1),
-                        )),
-                    focusedErrorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: const BorderSide(
-                          color: Color.fromRGBO(190, 186, 179, 1),
-                        )),
-                    errorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: const BorderSide(
-                          color: Color.fromRGBO(190, 186, 179, 1),
-                        )),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: const BorderSide(
-                          color: Color.fromRGBO(190, 186, 179, 1),
-                        )),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: const BorderSide(
-                          color: Color.fromRGBO(190, 186, 179, 1),
-                        )),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isShow = !isShow;
-                        });
-                      },
-                      child: isShow == false
-                          ? Image.asset('assets/images/password_show.png')
-                          : Image.asset('assets/images/password_hide.png'),
-                    ),
-                    contentPadding: EdgeInsets.only(left: 16, top: 10),
-                    border: InputBorder.none,
-                    hintText: 'Nhập mật khẩu của bạn',
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => ForgotPasswordScreen()));
-                },
-                child: Container(
-                  color: Colors.blue,
-                  child: Text('Quên mật khẩu'),
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Container(
-                decoration: BoxDecoration(color: Colors.green),
-                child: GestureDetector(
-                    onTap: () {
-                      if (formKey.currentState!.validate()) {
-                        context.read<LoginCubit>().login(
-                              ctx: context,
-                            );
-                      } else if (context
-                                  .read<LoginCubit>()
-                                  .emailController
-                                  .text ==
-                              'admin' &&
-                          context.read<LoginCubit>().passwordController.text ==
-                              'admin') {
-                        Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (context) => AdminScreen()),
-                            (route) => false);
-                        // Navigator.of(context).pushNamedAndRemoveUntil(
-                        //     AdminScreen.routeName, (route) => false);
-                      }
-                    },
-                    child: Text('Đăng nhập')),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Row(
+            ),
+            Form(
+              key: formKey,
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    color: Colors.yellow,
-                    child: Text('Chưa có tài khoản ? '),
+                  Center(
+                    child: Text(
+                      'Dang nhap',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 400),
+                    child: TextFormField(
+                      controller: context.read<LoginCubit>().emailController,
+                      style: TextStyle(color: Colors.white),
+                      validator: (value) {
+                        if (!RegExp(
+                                r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+                            .hasMatch(value ?? 'Email không hợp lệ')) {
+                          return 'Vui lòng nhập email';
+                        }
+
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                          disabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25),
+                              borderSide: const BorderSide(
+                                color: Color.fromRGBO(190, 186, 179, 1),
+                              )),
+                          focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25),
+                              borderSide: const BorderSide(
+                                color: Color.fromRGBO(190, 186, 179, 1),
+                              )),
+                          errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25),
+                              borderSide: const BorderSide(
+                                color: Color.fromRGBO(190, 186, 179, 1),
+                              )),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25),
+                              borderSide: const BorderSide(
+                                color: Color.fromRGBO(190, 186, 179, 1),
+                              )),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25),
+                              borderSide: const BorderSide(
+                                color: Color.fromRGBO(190, 186, 179, 1),
+                              )),
+                          contentPadding: EdgeInsets.only(left: 16),
+                          border: InputBorder.none,
+                          hintText: 'Nhập email của bạn',
+                          hintStyle: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 400),
+                    child: TextFormField(
+                      controller: context.read<LoginCubit>().passwordController,
+                      style: TextStyle(color: Colors.white),
+                      obscureText: isShow,
+                      validator: (value) {
+                        if (!RegExp(r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$")
+                            .hasMatch(value ?? 'Mật khẩu không hợp lệ')) {
+                          return 'Vui lòng nhập mật khẩu';
+                        }
+
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                          disabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25),
+                              borderSide: const BorderSide(
+                                color: Color.fromRGBO(190, 186, 179, 1),
+                              )),
+                          focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25),
+                              borderSide: const BorderSide(
+                                color: Color.fromRGBO(190, 186, 179, 1),
+                              )),
+                          errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25),
+                              borderSide: const BorderSide(
+                                color: Color.fromRGBO(190, 186, 179, 1),
+                              )),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25),
+                              borderSide: const BorderSide(
+                                color: Color.fromRGBO(190, 186, 179, 1),
+                              )),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25),
+                              borderSide: const BorderSide(
+                                color: Color.fromRGBO(190, 186, 179, 1),
+                              )),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isShow = !isShow;
+                              });
+                            },
+                            child: isShow == false
+                                ? Image.asset('assets/images/password_show.png')
+                                : Image.asset(
+                                    'assets/images/password_hide.png'),
+                          ),
+                          contentPadding: EdgeInsets.only(left: 16, top: 10),
+                          border: InputBorder.none,
+                          hintText: 'Nhập mật khẩu của bạn',
+                          hintStyle: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 400),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                          color: Colors.purple,
+                          borderRadius: BorderRadius.circular(25)),
+                      child: GestureDetector(
+                          onTap: () {
+                            if (formKey.currentState!.validate()) {
+                              context.read<LoginCubit>().login(
+                                    ctx: context,
+                                  );
+                            } else if (context
+                                        .read<LoginCubit>()
+                                        .emailController
+                                        .text ==
+                                    'admin' &&
+                                context
+                                        .read<LoginCubit>()
+                                        .passwordController
+                                        .text ==
+                                    'admin') {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (context) => AdminScreen()),
+                                  (route) => false);
+                              // Navigator.of(context).pushNamedAndRemoveUntil(
+                              //     AdminScreen.routeName, (route) => false);
+                            }
+                          },
+                          child: Center(
+                              child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: Text(
+                              'Đăng nhập',
+                            ),
+                          ))),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => SignupScreen()));
+                          builder: (context) => ForgotPasswordScreen()));
                     },
-                    child: Container(
-                      decoration: BoxDecoration(color: Colors.red),
-                      child: Text('Đăng ký'),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 400),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Quên mật khẩu',
+                            style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
                     ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Chưa có tài khoản ? '),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => SignupScreen()));
+                        },
+                        child: Text(
+                          'Đăng ký',
+                          style: TextStyle(color: Colors.yellow),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
     });
