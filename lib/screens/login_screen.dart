@@ -167,8 +167,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               'admin' &&
                           context.read<LoginCubit>().passwordController.text ==
                               'admin') {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => AdminScreen()));
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (context) => AdminScreen()),
+                            (route) => false);
                         // Navigator.of(context).pushNamedAndRemoveUntil(
                         //     AdminScreen.routeName, (route) => false);
                       }

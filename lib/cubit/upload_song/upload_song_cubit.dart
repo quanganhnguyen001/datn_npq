@@ -48,6 +48,8 @@ class UploadSongCubit extends Cubit<UploadSongState> {
             title: doc['title'],
             url: doc['url'],
             coverUrl: doc['coverUrl'],
+            isTrending: doc['isTrending'],
+            dropDownValue: doc['dropDownValue'],
             songId: doc.id));
       }
 

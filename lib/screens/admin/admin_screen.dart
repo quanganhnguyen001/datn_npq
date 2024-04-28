@@ -4,6 +4,7 @@ import 'package:datn_npq/screens/admin/widget/update_playlist.dart';
 import 'package:datn_npq/screens/admin/widget/update_song.dart';
 import 'package:datn_npq/screens/admin/widget/upload_playlist_widget.dart';
 import 'package:datn_npq/screens/admin/widget/upload_song_widget.dart';
+import 'package:datn_npq/screens/login_screen.dart';
 import 'package:datn_npq/widgets/playlist_card.dart';
 import 'package:datn_npq/widgets/song_card.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,7 +22,15 @@ class AdminScreen extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          bottom: TabBar(
+          leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false);
+            },
+            icon: const Icon(Icons.logout_outlined),
+          ),
+          bottom: const TabBar(
             indicatorColor: Colors.green,
             labelColor: Colors.green,
             tabs: [
@@ -37,7 +46,7 @@ class AdminScreen extends StatelessWidget {
             ],
           ),
           centerTitle: true,
-          title: Text(
+          title: const Text(
             'Admin',
             style: TextStyle(color: Colors.white),
           ),
@@ -48,25 +57,27 @@ class AdminScreen extends StatelessWidget {
               onTap: () {
                 showMenu(
                     context: context,
-                    position: RelativeRect.fromLTRB(100, 50, 0, 0),
+                    position: const RelativeRect.fromLTRB(100, 50, 0, 0),
                     items: [
                       PopupMenuItem(
                           onTap: () {
                             Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => UploadPlaylistWidget()));
+                                builder: (context) =>
+                                    const UploadPlaylistWidget()));
                           },
-                          child: Text('Them Playlist')),
+                          child: const Text('Them Playlist')),
                       PopupMenuItem(
                           onTap: () {
                             Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => UploadSongWidget()));
+                                builder: (context) =>
+                                    const UploadSongWidget()));
                           },
-                          child: Text('Them Bai hat')),
+                          child: const Text('Them Bai hat')),
                     ]);
               },
               child: Container(
                   margin: const EdgeInsets.only(right: 20),
-                  child: Icon(Icons.add)),
+                  child: const Icon(Icons.add)),
             ),
           ],
         ),

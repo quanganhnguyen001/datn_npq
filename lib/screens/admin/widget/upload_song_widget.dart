@@ -229,6 +229,7 @@ class _UploadSongWidgetState extends State<UploadSongWidget> {
                   height: 20,
                 ),
                 DropdownButton(
+                  focusColor: Colors.transparent,
                   hint: Text('Chon playlist'),
                   style: TextStyle(color: Colors.red),
                   value: dropDownValue,
@@ -273,6 +274,7 @@ class _UploadSongWidgetState extends State<UploadSongWidget> {
                               description: descriptionController.text,
                               url: audioUrl,
                               coverUrl: imageUrl,
+                              dropDownValue: dropDownValue,
                             ));
                             docId = i.playlistId;
                             newSong = i.songs ?? [];
@@ -288,6 +290,7 @@ class _UploadSongWidgetState extends State<UploadSongWidget> {
                                     coverUrl: imageUrl,
                                     url: audioUrl,
                                     isTrending: isTrending,
+                                    dropDownValue: dropDownValue,
                                     description: descriptionController.text)
                                 .toMap());
                       } catch (e) {

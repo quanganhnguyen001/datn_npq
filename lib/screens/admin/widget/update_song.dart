@@ -13,6 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:path/path.dart' as path;
 
 class UpdateSong extends StatefulWidget {
   const UpdateSong({super.key, required this.song});
@@ -33,18 +34,22 @@ class _UpdateSongState extends State<UpdateSong> {
   String? dropDownValue;
   String? docId;
   List<Song> newSong = [];
+  bool? isTrending;
 
   @override
   void initState() {
     titleController.text = widget.song.title ?? '';
     descriptionController.text = widget.song.description ?? '';
-
+    isTrending = widget.song.isTrending;
+    dropDownValue = widget.song.dropDownValue ?? '';
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    print(widget.song.isTrending);
+    String url = widget.song.url ?? '';
+    String fileName = path.basename(url);
+
     return Scaffold(
       body: Form(
         key: formKey,
@@ -204,9 +209,12 @@ class _UpdateSongState extends State<UpdateSong> {
                           });
                         }
                       },
-                      child: Text(
-                        songPicked == '' ? (widget.song.url ?? '') : songPicked,
-                        style: TextStyle(color: Colors.red),
+                      child: SizedBox(
+                        child: Text(
+                          overflow: TextOverflow.ellipsis,
+                          songPicked == '' ? (fileName) : songPicked,
+                          style: TextStyle(color: Colors.red),
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -215,16 +223,14 @@ class _UpdateSongState extends State<UpdateSong> {
                     Column(
                       children: [
                         CupertinoSwitch(
-                            value: widget.song.isTrending ?? false,
+                            value: isTrending ?? false,
                             onChanged: (value) {
-                              var trending;
-                              trending = widget.song.isTrending;
                               setState(() {
-                                trending = value;
+                                isTrending = value;
                               });
                             }),
                         Text(
-                          widget.song.isTrending == false
+                          isTrending == false
                               ? 'Khong Thinh hanh'
                               : 'Thinh hanh',
                           style: TextStyle(color: Colors.red),
@@ -237,6 +243,7 @@ class _UpdateSongState extends State<UpdateSong> {
                   height: 20,
                 ),
                 DropdownButton(
+                  focusColor: Colors.transparent,
                   hint: Text('Chon playlist'),
                   style: TextStyle(color: Colors.red),
                   value: dropDownValue,
@@ -255,7 +262,7 @@ class _UpdateSongState extends State<UpdateSong> {
                 GestureDetector(
                   onTap: () async {
                     if (formKey.currentState!.validate()) {
-                      if (imageSong != null) {
+                      if (imageSong != null && audioFile != null) {
                         EasyLoading.show();
                         try {
                           html.Blob blob = html.Blob([imageSong]);
@@ -280,6 +287,7 @@ class _UpdateSongState extends State<UpdateSong> {
                               i.songs?.add(Song(
                                 title: titleController.text,
                                 description: descriptionController.text,
+                                dropDownValue: dropDownValue,
                                 url: audioUrl,
                                 coverUrl: imageUrl,
                               ));
@@ -291,12 +299,14 @@ class _UpdateSongState extends State<UpdateSong> {
                               .collection('playlist')
                               .doc(docId)
                               .update(Playlist(songs: newSong).toMap());
+
                           FirebaseFirestore.instance
                               .collection('song')
-                              .doc()
-                              .set(Song(
+                              .doc(widget.song.songId)
+                              .update(Song(
                                       title: titleController.text,
                                       coverUrl: imageUrl,
+                                      dropDownValue: dropDownValue,
                                       url: audioUrl,
                                       isTrending: widget.song.isTrending,
                                       description: descriptionController.text)
@@ -327,40 +337,12 @@ class _UpdateSongState extends State<UpdateSong> {
                       } else {
                         EasyLoading.show();
                         try {
-                          html.Blob blob = html.Blob([imageSong]);
-
-                          final refAudio = FirebaseStorage.instance
-                              .ref()
-                              .child('audio')
-                              .child(songPicked);
-
-                          if (audioFile != null) {
-                            await refAudio.putData(audioFile!);
-                          }
-                          String audioUrl = await refAudio.getDownloadURL();
-
-                          for (var i in state.playList) {
-                            if (i.title == dropDownValue) {
-                              i.songs?.add(Song(
-                                title: titleController.text,
-                                description: descriptionController.text,
-                                url: audioUrl,
-                              ));
-                              docId = i.playlistId;
-                              newSong = i.songs ?? [];
-                            }
-                          }
-                          FirebaseFirestore.instance
-                              .collection('playlist')
-                              .doc(docId)
-                              .update(Playlist(songs: newSong).toMap());
                           FirebaseFirestore.instance
                               .collection('song')
-                              .doc()
-                              .set(Song(
+                              .doc(widget.song.songId)
+                              .update(Song(
                                       title: titleController.text,
-                                      url: audioUrl,
-                                      isTrending: widget.song.isTrending,
+                                      isTrending: isTrending,
                                       description: descriptionController.text)
                                   .toMap());
                         } catch (e) {

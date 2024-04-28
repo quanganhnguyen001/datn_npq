@@ -7,6 +7,7 @@ class Song {
   final String? coverUrl;
   final String? songId;
   final bool? isTrending;
+  final String? dropDownValue;
 
   Song({
     this.title,
@@ -15,6 +16,7 @@ class Song {
     this.coverUrl,
     this.songId,
     this.isTrending,
+    this.dropDownValue,
   });
 
   Map<String, dynamic> toMap() {
@@ -38,6 +40,9 @@ class Song {
     if (isTrending != null) {
       result.addAll({'isTrending': isTrending});
     }
+    if (dropDownValue != null) {
+      result.addAll({'dropDownValue': dropDownValue});
+    }
 
     return result;
   }
@@ -50,6 +55,7 @@ class Song {
       coverUrl: map['coverUrl'],
       songId: map['songId'],
       isTrending: map['isTrending'],
+      dropDownValue: map['dropDownValue'],
     );
   }
 
