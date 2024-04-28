@@ -22,13 +22,6 @@ class SectionHeader extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
         ),
-        Text(
-          action,
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge!
-              .copyWith(color: Colors.white),
-        ),
       ],
     );
   }
