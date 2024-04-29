@@ -1,12 +1,11 @@
 import 'package:datn_npq/auth/model/user_model.dart';
 import 'package:datn_npq/cubit/music/music_cubit.dart';
-import 'package:datn_npq/models/playlist_model.dart';
-import 'package:datn_npq/models/song_model.dart';
-import 'package:datn_npq/screens/playlist_screen.dart';
+
 import 'package:datn_npq/screens/song_screen.dart';
-import 'package:datn_npq/widgets/playlist_card.dart';
+
 import 'package:datn_npq/widgets/section_header.dart';
-import 'package:datn_npq/widgets/song_card.dart';
+import 'package:datn_npq/widgets/playlist_widget.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -94,7 +93,7 @@ class _MusicScreenState extends State<MusicScreen> {
                   children: [
                     const Padding(
                       padding: EdgeInsets.only(right: 20.0),
-                      child: SectionHeader(title: 'Thịnh hành'),
+                      child: SectionHeader(title: ' Thể loại'),
                     ),
                     const SizedBox(height: 20),
                     SizedBox(
@@ -103,10 +102,12 @@ class _MusicScreenState extends State<MusicScreen> {
                         builder: (context, state) {
                           return ListView.builder(
                             scrollDirection: Axis.horizontal,
-                            itemCount: state.songList.length,
+                            itemCount: state.playList.length,
                             itemBuilder: (context, index) {
-                              return SongCard(
-                                song: state.songList[index],
+                              return PlaylistWidget(
+                                playlist: state.playList[index],
+                                user: widget.user,
+                                index: index,
                               );
                             },
                           );
@@ -120,28 +121,73 @@ class _MusicScreenState extends State<MusicScreen> {
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   children: [
-                    const SectionHeader(title: 'Thể loại'),
+                    SectionHeader(
+                      title: 'Thịnh hành',
+                      onTap: () {},
+                    ),
                     BlocBuilder<MusicCubit, MusicState>(
                       builder: (context, state) {
-                        return ListView.builder(
+                        return GridView.builder(
                           shrinkWrap: true,
                           padding: const EdgeInsets.only(top: 20),
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: state.playList.length,
-                          itemBuilder: ((context, index) {
-                            return PlaylistCard(
-                              playlist: state.playList[index],
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  mainAxisExtent: 150,
+                                  mainAxisSpacing: 10,
+                                  crossAxisSpacing: 10),
+                          itemCount: state.songList.length < 12
+                              ? state.songList.length
+                              : 12,
+                          itemBuilder: (context, index) {
+                            return InkWell(
                               onTap: () {
                                 Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => PlaylistScreen(
-                                          userModel: widget.user,
-                                          index: index,
-                                          title:
-                                              state.playList[index].title ?? '',
-                                        )));
+                                  builder: (context) => SongScreen(
+                                    song: state.songList,
+                                    index: index,
+                                  ),
+                                ));
                               },
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      state.songList[index].coverUrl ?? '',
+                                      height: 100,
+                                      width: 150,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        state.songList[index].title ?? '',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge!
+                                            .copyWith(
+                                                fontWeight: FontWeight.bold),
+                                      ),
+                                      Text(
+                                        state.songList[index].description ?? '',
+                                        maxLines: 2,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             );
-                          }),
+                          },
                         );
                       },
                     ),

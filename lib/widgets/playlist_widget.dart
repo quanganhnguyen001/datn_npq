@@ -1,23 +1,32 @@
+import 'package:datn_npq/auth/model/user_model.dart';
+import 'package:datn_npq/models/playlist_model.dart';
+import 'package:datn_npq/screens/playlist_screen.dart';
 import 'package:datn_npq/screens/song_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../models/song_model.dart';
 
-class SongCard extends StatelessWidget {
-  const SongCard({
+class PlaylistWidget extends StatelessWidget {
+  const PlaylistWidget({
     Key? key,
-    required this.song,
+    required this.playlist,
+    required this.user,
+    required this.index,
   }) : super(key: key);
 
-  final Song song;
+  final Playlist playlist;
+  final UserModel user;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => SongScreen(
-                  song: song,
+            builder: (context) => PlaylistScreen(
+                  userModel: user,
+                  index: index,
+                  title: playlist.title ?? '',
                 )));
       },
       child: Container(
@@ -32,7 +41,7 @@ class SongCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15.0),
                 image: DecorationImage(
                   image: NetworkImage(
-                    song.coverUrl ?? '',
+                    playlist.imageUrl ?? '',
                   ),
                   fit: BoxFit.cover,
                 ),
@@ -54,14 +63,14 @@ class SongCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        song.title ?? '',
+                        playlist.title ?? '',
                         style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                               color: Colors.deepPurple,
                               fontWeight: FontWeight.bold,
                             ),
                       ),
                       Text(
-                        song.description ?? '',
+                        '${playlist.songs?.length} bai hat',
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,

@@ -4,9 +4,24 @@ import 'package:flutter/material.dart';
 
 import '../theme/color_paletes.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key, required this.user});
   final UserModel user;
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final emailController = TextEditingController();
+  void initState() {
+    nameController.text = widget.user.name ?? '';
+    phoneController.text = widget.user.phone ?? '';
+    emailController.text = widget.user.email ?? '';
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +51,7 @@ class ProfileScreen extends StatelessWidget {
                           color: Colors.black12, shape: BoxShape.circle),
                     );
                   },
-                  imageUrl: user.imageUrl ?? '',
+                  imageUrl: widget.user.imageUrl ?? '',
                   imageBuilder: (context, imageProvider) => Container(
                     height: 155,
                     width: 140,
@@ -68,38 +83,140 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 50),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.yellow,
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: Text(user.name ?? ''),
-                ),
+              SizedBox(
+                height: 15,
+              ),
+              Text(
+                'Tên của bạn',
+                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 50),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.circular(25),
+                padding: const EdgeInsets.symmetric(horizontal: 400),
+                child: TextFormField(
+                  readOnly: true,
+                  controller: nameController,
+                  style: TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    disabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: const BorderSide(
+                          color: Color.fromRGBO(190, 186, 179, 1),
+                        )),
+                    focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: const BorderSide(
+                          color: Color.fromRGBO(190, 186, 179, 1),
+                        )),
+                    errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: const BorderSide(
+                          color: Color.fromRGBO(190, 186, 179, 1),
+                        )),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: const BorderSide(
+                          color: Color.fromRGBO(190, 186, 179, 1),
+                        )),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: const BorderSide(
+                          color: Color.fromRGBO(190, 186, 179, 1),
+                        )),
+                    contentPadding: EdgeInsets.only(left: 16),
+                    border: InputBorder.none,
+                    hintText: 'Tên tài khoản',
                   ),
-                  child: Text(user.email ?? ''),
                 ),
               ),
+              SizedBox(
+                height: 15,
+              ),
+              Text(
+                'Email của bạn',
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 50),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(25),
+                padding: const EdgeInsets.symmetric(horizontal: 400),
+                child: TextFormField(
+                  readOnly: true,
+                  controller: emailController,
+                  style: TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    disabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: const BorderSide(
+                          color: Color.fromRGBO(190, 186, 179, 1),
+                        )),
+                    focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: const BorderSide(
+                          color: Color.fromRGBO(190, 186, 179, 1),
+                        )),
+                    errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: const BorderSide(
+                          color: Color.fromRGBO(190, 186, 179, 1),
+                        )),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: const BorderSide(
+                          color: Color.fromRGBO(190, 186, 179, 1),
+                        )),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: const BorderSide(
+                          color: Color.fromRGBO(190, 186, 179, 1),
+                        )),
+                    contentPadding: EdgeInsets.only(left: 16),
+                    border: InputBorder.none,
+                    hintText: 'Tên tài khoản',
                   ),
-                  child: Text(user.phone != ""
-                      ? (user.phone ?? '')
-                      : 'Cập nhật số điện thoại'),
                 ),
-              )
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Text(
+                'SĐT của bạn',
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 400),
+                child: TextFormField(
+                  readOnly: true,
+                  controller: phoneController,
+                  style: TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                      disabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: const BorderSide(
+                            color: Color.fromRGBO(190, 186, 179, 1),
+                          )),
+                      focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: const BorderSide(
+                            color: Color.fromRGBO(190, 186, 179, 1),
+                          )),
+                      errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: const BorderSide(
+                            color: Color.fromRGBO(190, 186, 179, 1),
+                          )),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: const BorderSide(
+                            color: Color.fromRGBO(190, 186, 179, 1),
+                          )),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: const BorderSide(
+                            color: Color.fromRGBO(190, 186, 179, 1),
+                          )),
+                      contentPadding: EdgeInsets.only(left: 16),
+                      border: InputBorder.none,
+                      hintText: 'Cap nhat so dien thoai'),
+                ),
+              ),
             ],
           ),
         ),

@@ -1,5 +1,7 @@
 import 'package:datn_npq/cubit/music/music_cubit.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:just_audio/just_audio.dart';
@@ -9,8 +11,10 @@ import '../models/song_model.dart';
 import '../widgets/widgets.dart';
 
 class SongScreen extends StatefulWidget {
-  const SongScreen({Key? key, required this.song}) : super(key: key);
-  final Song song;
+  const SongScreen({Key? key, required this.song, required this.index})
+      : super(key: key);
+  final List<Song> song;
+  final int index;
 
   @override
   State<SongScreen> createState() => _SongScreenState();
@@ -19,12 +23,16 @@ class SongScreen extends StatefulWidget {
 class _SongScreenState extends State<SongScreen> {
   AudioPlayer audioPlayer = AudioPlayer();
   List<AudioSource> listAudioSource = [];
+  int indexPlaying = 0;
+  bool isLoading = true;
 
   @override
   void initState() {
-    listAudioSource.add(AudioSource.uri(Uri.parse(widget.song.url ?? '')));
+    indexPlaying = widget.index;
+    listAudioSource
+        .add(AudioSource.uri(Uri.parse(widget.song[widget.index].url ?? '')));
     for (var i in context.read<MusicCubit>().state.songList) {
-      if (i.url != widget.song.url) {
+      if (i.url != widget.song[widget.index].url) {
         listAudioSource.add(AudioSource.uri(Uri.parse(i.url ?? '')));
       }
     }
@@ -64,77 +72,177 @@ class _SongScreenState extends State<SongScreen> {
       ),
       extendBodyBehindAppBar: true,
       body: Stack(
-        fit: StackFit.expand,
         children: [
-          Image.network(
-            widget.song.coverUrl ?? '',
-            fit: BoxFit.cover,
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.deepPurple.shade800.withOpacity(0.8),
+                  Colors.deepPurple.shade200.withOpacity(0.8),
+                ],
+              ),
+            ),
           ),
-          const _BackgroundFilter(),
-          _MusicPlayer(
-            song: widget.song,
-            seekBarDataStream: _seekBarDataStream,
-            audioPlayer: audioPlayer,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MusicPlayer extends StatelessWidget {
-  const _MusicPlayer({
-    Key? key,
-    required this.song,
-    required Stream<SeekBarData> seekBarDataStream,
-    required this.audioPlayer,
-  })  : _seekBarDataStream = seekBarDataStream,
-        super(key: key);
-
-  final Song song;
-  final Stream<SeekBarData> _seekBarDataStream;
-  final AudioPlayer audioPlayer;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20.0,
-        vertical: 50.0,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            song.title ?? '',
-            style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+          Column(
+            children: [
+              SizedBox(
+                height: 30,
+              ),
+              CircleAvatar(
+                radius: 150,
+                backgroundImage: NetworkImage(
+                  widget.song[indexPlaying].coverUrl ?? '',
                 ),
+              ),
+              const _BackgroundFilter(),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 30.0,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.song[indexPlaying].title ?? '',
+                      style:
+                          Theme.of(context).textTheme.headlineSmall!.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      widget.song[indexPlaying].description ?? '',
+                      maxLines: 2,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall!
+                          .copyWith(color: Colors.white),
+                    ),
+                    const SizedBox(height: 30),
+                    StreamBuilder<SeekBarData>(
+                      stream: _seekBarDataStream,
+                      builder: (context, snapshot) {
+                        final positionData = snapshot.data;
+                        return SeekBar(
+                          position: positionData?.position ?? Duration.zero,
+                          duration: positionData?.duration ?? Duration.zero,
+                          onChangeEnd: audioPlayer.seek,
+                        );
+                      },
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        StreamBuilder<SequenceState?>(
+                          stream: audioPlayer.sequenceStateStream,
+                          builder: (context, index) {
+                            return IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (audioPlayer.hasPrevious) {
+                                    audioPlayer.seekToPrevious();
+                                    indexPlaying -= 1;
+                                  } else {
+                                    return;
+                                  }
+                                });
+                              },
+                              // onPressed: audioPlayer.hasPrevious
+                              //     ? audioPlayer.seekToPrevious
+                              //     : null,
+                              iconSize: 45,
+                              icon: const Icon(
+                                Icons.skip_previous,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
+                        ),
+                        StreamBuilder<PlayerState>(
+                          stream: audioPlayer.playerStateStream,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              final playerState = snapshot.data;
+                              final processingState =
+                                  playerState!.processingState;
+
+                              if (processingState == ProcessingState.loading ||
+                                  processingState ==
+                                      ProcessingState.buffering) {
+                                return Container(
+                                  width: 64.0,
+                                  height: 64.0,
+                                  margin: const EdgeInsets.all(10.0),
+                                  child: const CircularProgressIndicator(),
+                                );
+                              } else if (!audioPlayer.playing) {
+                                return IconButton(
+                                  onPressed: audioPlayer.play,
+                                  iconSize: 75,
+                                  icon: const Icon(
+                                    Icons.play_circle,
+                                    color: Colors.white,
+                                  ),
+                                );
+                              } else if (processingState !=
+                                  ProcessingState.completed) {
+                                return IconButton(
+                                  icon: const Icon(
+                                    Icons.pause_circle,
+                                    color: Colors.white,
+                                  ),
+                                  iconSize: 75.0,
+                                  onPressed: audioPlayer.pause,
+                                );
+                              } else {
+                                return IconButton(
+                                  icon: const Icon(
+                                    Icons.replay_circle_filled_outlined,
+                                    color: Colors.white,
+                                  ),
+                                  iconSize: 75.0,
+                                  onPressed: () {},
+                                );
+                              }
+                            } else {
+                              return const CircularProgressIndicator();
+                            }
+                          },
+                        ),
+                        StreamBuilder<SequenceState?>(
+                          stream: audioPlayer.sequenceStateStream,
+                          builder: (context, index) {
+                            return IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (audioPlayer.hasNext) {
+                                    audioPlayer.seekToNext();
+                                    indexPlaying += 1;
+                                  } else {
+                                    return;
+                                  }
+                                });
+                              },
+                              iconSize: 45,
+                              icon: const Icon(
+                                Icons.skip_next,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              )
+            ],
           ),
-          const SizedBox(height: 10),
-          Text(
-            song.description ?? '',
-            maxLines: 2,
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall!
-                .copyWith(color: Colors.white),
-          ),
-          const SizedBox(height: 30),
-          StreamBuilder<SeekBarData>(
-            stream: _seekBarDataStream,
-            builder: (context, snapshot) {
-              final positionData = snapshot.data;
-              return SeekBar(
-                position: positionData?.position ?? Duration.zero,
-                duration: positionData?.duration ?? Duration.zero,
-                onChangeEnd: audioPlayer.seek,
-              );
-            },
-          ),
-          PlayerButtons(audioPlayer: audioPlayer),
         ],
       ),
     );

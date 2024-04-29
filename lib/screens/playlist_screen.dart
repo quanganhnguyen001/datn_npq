@@ -31,7 +31,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   AudioPlayer audioPlayer = AudioPlayer();
   int indexPlaying = 0;
   bool hovering = false;
-
+  bool isLoading = true;
   bool isPlaying = false;
 
   Stream<SeekBarData> get _seekBarDataStream =>
@@ -60,13 +60,6 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          centerTitle: true,
-          leading: Container(),
-          title: Text(widget.title),
-        ),
         body: Stack(
           children: [
             SizedBox(
@@ -95,7 +88,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                     child: Row(
                                       children: [
                                         Text(
-                                          '${widget.index + 1}',
+                                          '${index1 + 1}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyMedium!
@@ -397,21 +390,70 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                                   onPressed: audioPlayer.pause,
                                                 );
                                               } else {
-                                                return IconButton(
-                                                  icon: const Icon(
-                                                    Icons
-                                                        .replay_circle_filled_outlined,
-                                                    color: Colors.white,
-                                                  ),
-                                                  iconSize: 55.0,
-                                                  onPressed: () =>
-                                                      audioPlayer.seek(
-                                                    Duration.zero,
-                                                    index: audioPlayer
-                                                        .effectiveIndices!
-                                                        .first,
-                                                  ),
-                                                );
+                                                if (isLoading) {
+                                                  WidgetsBinding.instance!
+                                                      .addPostFrameCallback(
+                                                          (_) {
+                                                    setState(() {
+                                                      if (indexPlaying !=
+                                                          (state
+                                                                      .playList[
+                                                                          widget
+                                                                              .index]
+                                                                      .songs
+                                                                      ?.length ??
+                                                                  0) -
+                                                              1) {
+                                                        indexPlaying =
+                                                            indexPlaying + 1;
+                                                        isLoading = false;
+                                                      } else {
+                                                        return;
+                                                      }
+                                                      audioPlayer
+                                                          .setAudioSource(
+                                                        ConcatenatingAudioSource(
+                                                            children: [
+                                                              AudioSource.uri(Uri.parse(state
+                                                                      .playList[
+                                                                          widget
+                                                                              .index]
+                                                                      .songs?[
+                                                                          indexPlaying]
+                                                                      .url ??
+                                                                  ''))
+                                                            ]),
+                                                      );
+                                                    });
+                                                  });
+                                                }
+                                                return isLoading
+                                                    ? CircularProgressIndicator()
+                                                    : IconButton(
+                                                        icon: const Icon(
+                                                          Icons
+                                                              .replay_circle_filled_outlined,
+                                                          color: Colors.white,
+                                                        ),
+                                                        iconSize: 43.0,
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            audioPlayer
+                                                                .setAudioSource(
+                                                              ConcatenatingAudioSource(
+                                                                children: [
+                                                                  AudioSource.uri(Uri.parse(state
+                                                                          .playList[widget
+                                                                              .index]
+                                                                          .songs?[
+                                                                              indexPlaying]
+                                                                          .url ??
+                                                                      '')),
+                                                                ],
+                                                              ),
+                                                            );
+                                                          });
+                                                        });
                                               }
                                             } else {
                                               return const CircularProgressIndicator();

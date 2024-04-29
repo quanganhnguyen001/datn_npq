@@ -6,7 +6,7 @@ import 'package:datn_npq/screens/admin/widget/upload_playlist_widget.dart';
 import 'package:datn_npq/screens/admin/widget/upload_song_widget.dart';
 import 'package:datn_npq/screens/login_screen.dart';
 import 'package:datn_npq/widgets/playlist_card.dart';
-import 'package:datn_npq/widgets/song_card.dart';
+import 'package:datn_npq/widgets/playlist_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
