@@ -62,8 +62,7 @@ class _UpdateSongState extends State<UpdateSong> {
                 ),
                 GestureDetector(
                     onTap: () async {
-                      FilePickerResult? file =
-                          await FilePicker.platform.pickFiles(
+                      FilePickerResult? file = await FilePicker.platform.pickFiles(
                         type: FileType.image,
                         allowCompression: true,
                       );
@@ -80,10 +79,7 @@ class _UpdateSongState extends State<UpdateSong> {
                             child: Container(
                               height: 200,
                               width: 200,
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 3,
-                                      color: ColorPalettes.secondaryColor)),
+                              decoration: BoxDecoration(border: Border.all(width: 3, color: ColorPalettes.secondaryColor)),
                               child: Image.network(widget.song.coverUrl ?? ''),
                             ),
                           )
@@ -91,10 +87,7 @@ class _UpdateSongState extends State<UpdateSong> {
                             child: Container(
                                 height: 200,
                                 width: 200,
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                        width: 3,
-                                        color: ColorPalettes.secondaryColor)),
+                                decoration: BoxDecoration(border: Border.all(width: 3, color: ColorPalettes.secondaryColor)),
                                 child: Image.memory(imageSong ?? Uint8List(0))),
                           )),
                 SizedBox(
@@ -197,8 +190,7 @@ class _UpdateSongState extends State<UpdateSong> {
                   children: [
                     GestureDetector(
                       onTap: () async {
-                        FilePickerResult? result =
-                            await FilePicker.platform.pickFiles(
+                        FilePickerResult? result = await FilePicker.platform.pickFiles(
                           type: FileType.audio,
                         );
 
@@ -230,9 +222,7 @@ class _UpdateSongState extends State<UpdateSong> {
                               });
                             }),
                         Text(
-                          isTrending == false
-                              ? 'Khong Thinh hanh'
-                              : 'Thinh hanh',
+                          isTrending == false ? 'Khong Thinh hanh' : 'Thinh hanh',
                           style: TextStyle(color: Colors.red),
                         )
                       ],
@@ -242,23 +232,6 @@ class _UpdateSongState extends State<UpdateSong> {
                 SizedBox(
                   height: 20,
                 ),
-                DropdownButton(
-                  focusColor: Colors.transparent,
-                  hint: Text('Chon playlist'),
-                  style: TextStyle(color: Colors.red),
-                  value: dropDownValue,
-                  items: state.playList.map((e) {
-                    return DropdownMenuItem(
-                      child: Text(e.title ?? ''),
-                      value: e.title,
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      dropDownValue = value.toString();
-                    });
-                  },
-                ),
                 GestureDetector(
                   onTap: () async {
                     if (formKey.currentState!.validate()) {
@@ -266,14 +239,8 @@ class _UpdateSongState extends State<UpdateSong> {
                         EasyLoading.show();
                         try {
                           html.Blob blob = html.Blob([imageSong]);
-                          final ref = FirebaseStorage.instance
-                              .ref()
-                              .child('songImage')
-                              .child(name);
-                          final refAudio = FirebaseStorage.instance
-                              .ref()
-                              .child('audio')
-                              .child(songPicked);
+                          final ref = FirebaseStorage.instance.ref().child('songImage').child(name);
+                          final refAudio = FirebaseStorage.instance.ref().child('audio').child(songPicked);
                           if (imageSong != null) {
                             await ref.putBlob(blob);
                           }
@@ -282,48 +249,26 @@ class _UpdateSongState extends State<UpdateSong> {
                           }
                           String audioUrl = await refAudio.getDownloadURL();
                           String imageUrl = await ref.getDownloadURL();
-                          for (var i in state.playList) {
-                            if (i.title == dropDownValue) {
-                              i.songs?.add(Song(
-                                title: titleController.text,
-                                description: descriptionController.text,
-                                dropDownValue: dropDownValue,
-                                url: audioUrl,
-                                coverUrl: imageUrl,
-                              ));
-                              docId = i.playlistId;
-                              newSong = i.songs ?? [];
-                            }
-                          }
-                          FirebaseFirestore.instance
-                              .collection('playlist')
-                              .doc(docId)
-                              .update(Playlist(songs: newSong).toMap());
 
-                          FirebaseFirestore.instance
-                              .collection('song')
-                              .doc(widget.song.songId)
-                              .update(Song(
-                                      title: titleController.text,
-                                      coverUrl: imageUrl,
-                                      dropDownValue: dropDownValue,
-                                      url: audioUrl,
-                                      isTrending: widget.song.isTrending,
-                                      description: descriptionController.text)
-                                  .toMap());
+                          FirebaseFirestore.instance.collection('song').doc(widget.song.songId).update(Song(
+                                  title: titleController.text,
+                                  coverUrl: imageUrl,
+                                  dropDownValue: dropDownValue,
+                                  url: audioUrl,
+                                  view: 0,
+                                  isTrending: widget.song.isTrending,
+                                  description: descriptionController.text)
+                              .toMap());
                         } catch (e) {
                           showDialog(
                               context: context,
                               builder: (ctx) {
-                                Future.delayed((const Duration(seconds: 2)),
-                                    () {
+                                Future.delayed((const Duration(seconds: 2)), () {
                                   Navigator.of(context).pop();
                                 });
                                 return AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20)),
-                                  title: Image.asset(
-                                      'assets/images/alert_password.png'),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                  title: Image.asset('assets/images/alert_password.png'),
                                   content: Text(
                                     e.toString(),
                                     textAlign: TextAlign.center,
@@ -337,27 +282,18 @@ class _UpdateSongState extends State<UpdateSong> {
                       } else {
                         EasyLoading.show();
                         try {
-                          FirebaseFirestore.instance
-                              .collection('song')
-                              .doc(widget.song.songId)
-                              .update(Song(
-                                      title: titleController.text,
-                                      isTrending: isTrending,
-                                      description: descriptionController.text)
-                                  .toMap());
+                          FirebaseFirestore.instance.collection('song').doc(widget.song.songId).update(
+                              Song(view: 0, title: titleController.text, isTrending: isTrending, description: descriptionController.text).toMap());
                         } catch (e) {
                           showDialog(
                               context: context,
                               builder: (ctx) {
-                                Future.delayed((const Duration(seconds: 2)),
-                                    () {
+                                Future.delayed((const Duration(seconds: 2)), () {
                                   Navigator.of(context).pop();
                                 });
                                 return AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20)),
-                                  title: Image.asset(
-                                      'assets/images/alert_password.png'),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                  title: Image.asset('assets/images/alert_password.png'),
                                   content: Text(
                                     e.toString(),
                                     textAlign: TextAlign.center,

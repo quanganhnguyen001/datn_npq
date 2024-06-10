@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:datn_npq/cubit/music/music_cubit.dart';
 
 import 'package:flutter/material.dart';
@@ -11,8 +14,7 @@ import '../models/song_model.dart';
 import '../widgets/widgets.dart';
 
 class SongScreen extends StatefulWidget {
-  const SongScreen({Key? key, required this.song, required this.index})
-      : super(key: key);
+  const SongScreen({Key? key, required this.song, required this.index}) : super(key: key);
   final List<Song> song;
   final int index;
 
@@ -25,12 +27,13 @@ class _SongScreenState extends State<SongScreen> {
   List<AudioSource> listAudioSource = [];
   int indexPlaying = 0;
   bool isLoading = true;
+  int _counter = 0;
+  Timer? _timer;
 
   @override
   void initState() {
     indexPlaying = widget.index;
-    listAudioSource
-        .add(AudioSource.uri(Uri.parse(widget.song[widget.index].url ?? '')));
+    listAudioSource.add(AudioSource.uri(Uri.parse(widget.song[widget.index].url ?? '')));
     for (var i in context.read<MusicCubit>().state.songList) {
       if (i.url != widget.song[widget.index].url) {
         listAudioSource.add(AudioSource.uri(Uri.parse(i.url ?? '')));
@@ -47,15 +50,33 @@ class _SongScreenState extends State<SongScreen> {
   @override
   void dispose() {
     audioPlayer.dispose();
+    _timer?.cancel();
     super.dispose();
   }
 
   Stream<SeekBarData> get _seekBarDataStream =>
-      rxdart.Rx.combineLatest2<Duration, Duration?, SeekBarData>(
-          audioPlayer.positionStream, audioPlayer.durationStream, (
+      rxdart.Rx.combineLatest2<Duration, Duration?, SeekBarData>(audioPlayer.positionStream, audioPlayer.durationStream, (
         Duration position,
         Duration? duration,
       ) {
+        _timer = Timer.periodic(Duration(seconds: 10), (Timer timer) {
+          _counter++;
+        });
+        // print(position.toString().split('0:00:').last);
+        if (_counter == 10) {
+          FirebaseFirestore.instance
+              .collection('song')
+              .doc(widget.song[widget.index].songId)
+              .update(Song(view: (widget.song[widget.index].view ?? 0) + 1).toMap());
+        }
+        // if (position.toString().split('0:00:').last.toString() == '10.154000') {
+        //   print('OKKKKKK');
+        //   // FirebaseFirestore.instance
+        //   //     .collection('song')
+        //   //     .doc(widget.song[widget.index].songId)
+        //   //     .update(Song(view: (widget.song[widget.index].view) ?? 0 + 1).toMap());
+        // }
+
         return SeekBarData(
           position,
           duration ?? Duration.zero,
@@ -64,6 +85,7 @@ class _SongScreenState extends State<SongScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.song[widget.index].view);
     return Scaffold(
       appBar: AppBar(
         leading: Container(),
@@ -108,20 +130,16 @@ class _SongScreenState extends State<SongScreen> {
                   children: [
                     Text(
                       widget.song[indexPlaying].title ?? '',
-                      style:
-                          Theme.of(context).textTheme.headlineSmall!.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                     const SizedBox(height: 10),
                     Text(
                       widget.song[indexPlaying].description ?? '',
                       maxLines: 2,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall!
-                          .copyWith(color: Colors.white),
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.white),
                     ),
                     const SizedBox(height: 30),
                     StreamBuilder<SeekBarData>(
@@ -168,12 +186,9 @@ class _SongScreenState extends State<SongScreen> {
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               final playerState = snapshot.data;
-                              final processingState =
-                                  playerState!.processingState;
+                              final processingState = playerState!.processingState;
 
-                              if (processingState == ProcessingState.loading ||
-                                  processingState ==
-                                      ProcessingState.buffering) {
+                              if (processingState == ProcessingState.loading || processingState == ProcessingState.buffering) {
                                 return Container(
                                   width: 64.0,
                                   height: 64.0,
@@ -189,8 +204,7 @@ class _SongScreenState extends State<SongScreen> {
                                     color: Colors.white,
                                   ),
                                 );
-                              } else if (processingState !=
-                                  ProcessingState.completed) {
+                              } else if (processingState != ProcessingState.completed) {
                                 return IconButton(
                                   icon: const Icon(
                                     Icons.pause_circle,
@@ -258,19 +272,15 @@ class _BackgroundFilter extends StatelessWidget {
   Widget build(BuildContext context) {
     return ShaderMask(
       shaderCallback: (rect) {
-        return LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.white,
-              Colors.white.withOpacity(0.5),
-              Colors.white.withOpacity(0.0),
-            ],
-            stops: const [
-              0.0,
-              0.4,
-              0.6
-            ]).createShader(rect);
+        return LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+          Colors.white,
+          Colors.white.withOpacity(0.5),
+          Colors.white.withOpacity(0.0),
+        ], stops: const [
+          0.0,
+          0.4,
+          0.6
+        ]).createShader(rect);
       },
       blendMode: BlendMode.dstOut,
       child: Container(

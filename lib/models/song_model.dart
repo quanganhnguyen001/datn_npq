@@ -8,6 +8,7 @@ class Song {
   final String? songId;
   final bool? isTrending;
   final String? dropDownValue;
+  final int? view;
 
   Song({
     this.title,
@@ -17,6 +18,7 @@ class Song {
     this.songId,
     this.isTrending,
     this.dropDownValue,
+    this.view,
   });
 
   Map<String, dynamic> toMap() {
@@ -43,6 +45,9 @@ class Song {
     if (dropDownValue != null) {
       result.addAll({'dropDownValue': dropDownValue});
     }
+    if (view != null) {
+      result.addAll({'view': view});
+    }
 
     return result;
   }
@@ -56,6 +61,7 @@ class Song {
       songId: map['songId'],
       isTrending: map['isTrending'],
       dropDownValue: map['dropDownValue'],
+      view: map['view']?.toInt(),
     );
   }
 

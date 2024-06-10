@@ -16,20 +16,13 @@ class MusicCubit extends Cubit<MusicState> {
   }
 
   fetchDataPlaylist() {
-    FirebaseFirestore.instance
-        .collection('playlist')
-        .snapshots()
-        .listen((QuerySnapshot snapshot) {
+    FirebaseFirestore.instance.collection('playlist').snapshots().listen((QuerySnapshot snapshot) {
       List<Playlist> playListFetch = [];
       for (var doc in snapshot.docs) {
         var songsList = doc['songs'] as List<dynamic>;
         List<Song> songs = songsList.map((item) => Song.fromMap(item)).toList();
 
-        playListFetch.add(Playlist(
-            imageUrl: doc['imageUrl'],
-            songs: songs,
-            title: doc['title'],
-            playlistId: doc.id));
+        playListFetch.add(Playlist(imageUrl: doc['imageUrl'], songs: songs, title: doc['title'], playlistId: doc.id));
       }
 
       emit(state.copyWith(playList: playListFetch));
@@ -37,11 +30,7 @@ class MusicCubit extends Cubit<MusicState> {
   }
 
   fetchDataSonglist() {
-    FirebaseFirestore.instance
-        .collection('song')
-        .where('isTrending', isEqualTo: true)
-        .snapshots()
-        .listen((QuerySnapshot snapshot) {
+    FirebaseFirestore.instance.collection('song').where('isTrending', isEqualTo: true).snapshots().listen((QuerySnapshot snapshot) {
       List<Song> songListFetch = [];
       for (var doc in snapshot.docs) {
         songListFetch.add(Song(
@@ -50,6 +39,7 @@ class MusicCubit extends Cubit<MusicState> {
             url: doc['url'],
             coverUrl: doc['coverUrl'],
             isTrending: doc['isTrending'],
+            view: doc['view'],
             songId: doc.id));
       }
 

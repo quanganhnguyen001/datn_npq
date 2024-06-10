@@ -3,6 +3,7 @@ import 'package:datn_npq/screens/favorite_screen.dart';
 import 'package:datn_npq/screens/music_screen.dart';
 
 import 'package:datn_npq/screens/profile_screen.dart';
+import 'package:datn_npq/screens/ranking_song.dart';
 import 'package:datn_npq/screens/update_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -57,6 +58,16 @@ class _HomeScreenState extends State<HomeScreen> {
               backgroundColor: Colors.transparent,
               appBar: AppBar(
                 centerTitle: true,
+                leading: IconButton(
+                  icon: Icon(
+                    Icons.list,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).push((MaterialPageRoute(builder: (context) => RankingSong())));
+                  },
+                ),
                 title: Text(
                   currentIndex == 0
                       ? 'Quân MP3'
@@ -70,29 +81,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 actions: [
                   GestureDetector(
                     onTap: () {
-                      showMenu(
-                          context: context,
-                          position: RelativeRect.fromLTRB(100, 50, 0, 0),
-                          items: [
-                            PopupMenuItem(
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => UpdateProfileScreen(
-                                          user: state.user ?? UserModel())));
-                                },
-                                child: Text('Cập nhật thông tin tài khoản')),
-                            PopupMenuItem(
-                                onTap: () {
-                                  context.read<AuthCubit>().logout();
-                                },
-                                child: Text('Đăng xuất'))
-                          ]);
+                      showMenu(context: context, position: RelativeRect.fromLTRB(100, 50, 0, 0), items: [
+                        PopupMenuItem(
+                            onTap: () {
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) => UpdateProfileScreen(user: state.user ?? UserModel())));
+                            },
+                            child: Text('Cập nhật thông tin tài khoản')),
+                        PopupMenuItem(
+                            onTap: () {
+                              context.read<AuthCubit>().logout();
+                            },
+                            child: Text('Đăng xuất'))
+                      ]);
                     },
                     child: Container(
                       margin: const EdgeInsets.only(right: 20),
                       child: CircleAvatar(
-                        backgroundImage: NetworkImage(
-                            (state.user ?? UserModel()).imageUrl ?? ''),
+                        backgroundImage: NetworkImage((state.user ?? UserModel()).imageUrl ?? ''),
                       ),
                     ),
                   ),
