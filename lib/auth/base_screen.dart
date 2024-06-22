@@ -1,3 +1,4 @@
+import 'package:datn_npq/anonymus/anonymus_screen.dart';
 import 'package:datn_npq/screens/home_screen.dart';
 import 'package:datn_npq/screens/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -26,14 +27,10 @@ class _BaseScreenState extends State<BaseScreen> {
       },
       listener: (context, state) {
         if (state is UnAuthenticated) {
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => LoginScreen()),
-              (route) => false);
+          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => AnonymusScreen()), (route) => false);
         }
         if (state is Authenticated) {
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => HomeScreen()),
-              (route) => false);
+          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => HomeScreen()), (route) => false);
         }
       },
       child: BaseScreenBuilder(builder: widget.builder),

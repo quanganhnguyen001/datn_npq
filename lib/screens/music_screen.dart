@@ -56,10 +56,7 @@ class _MusicScreenState extends State<MusicScreen> {
                     const SizedBox(height: 5),
                     Text(
                       'Tận hưởng giai diệu yêu thích của bạn',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline6!
-                          .copyWith(fontWeight: FontWeight.bold),
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
@@ -68,12 +65,8 @@ class _MusicScreenState extends State<MusicScreen> {
                         filled: true,
                         fillColor: Colors.white,
                         hintText: 'Tìm kiếm',
-                        hintStyle: Theme.of(context)
-                            .textTheme
-                            .bodyMedium!
-                            .copyWith(color: Colors.grey.shade400),
-                        prefixIcon:
-                            Icon(Icons.search, color: Colors.grey.shade400),
+                        hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.grey.shade400),
+                        prefixIcon: Icon(Icons.search, color: Colors.grey.shade400),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15.0),
                           borderSide: BorderSide.none,
@@ -131,15 +124,9 @@ class _MusicScreenState extends State<MusicScreen> {
                           shrinkWrap: true,
                           padding: const EdgeInsets.only(top: 20),
                           physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
-                                  mainAxisExtent: 150,
-                                  mainAxisSpacing: 10,
-                                  crossAxisSpacing: 10),
-                          itemCount: state.songList.length < 12
-                              ? state.songList.length
-                              : 12,
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3, mainAxisExtent: 150, mainAxisSpacing: 10, crossAxisSpacing: 10),
+                          itemCount: state.songList.length < 12 ? state.songList.length : 12,
                           itemBuilder: (context, index) {
                             return InkWell(
                               onTap: () {
@@ -164,23 +151,16 @@ class _MusicScreenState extends State<MusicScreen> {
                                   ),
                                   const SizedBox(width: 10),
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         state.songList[index].title ?? '',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge!
-                                            .copyWith(
-                                                fontWeight: FontWeight.bold),
+                                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
                                       ),
                                       Text(
                                         state.songList[index].description ?? '',
                                         maxLines: 2,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall,
+                                        style: Theme.of(context).textTheme.bodySmall,
                                       ),
                                     ],
                                   ),
