@@ -29,11 +29,14 @@ class _UploadSongWidgetState extends State<UploadSongWidget> {
   final formKey = GlobalKey<FormState>();
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
+  final artisController = TextEditingController();
   Uint8List? imageSong;
   String songPicked = '';
   String name = '';
   Uint8List? audioFile;
   String? dropDownValue;
+  String? dropDownValueType;
+
   String? docId;
   List<Song> newSong = [];
 
@@ -47,7 +50,7 @@ class _UploadSongWidgetState extends State<UploadSongWidget> {
             return Column(
               children: [
                 SizedBox(
-                  height: 50,
+                  height: 20,
                 ),
                 GestureDetector(
                     onTap: () async {
@@ -173,6 +176,52 @@ class _UploadSongWidgetState extends State<UploadSongWidget> {
                 SizedBox(
                   height: 20,
                 ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 400),
+                  child: TextFormField(
+                    controller: artisController,
+                    style: TextStyle(color: Colors.black),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Vui lòng nhập tên ca sĩ';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      disabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: const BorderSide(
+                            color: Color.fromRGBO(190, 186, 179, 1),
+                          )),
+                      focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: const BorderSide(
+                            color: Color.fromRGBO(190, 186, 179, 1),
+                          )),
+                      errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: const BorderSide(
+                            color: Color.fromRGBO(190, 186, 179, 1),
+                          )),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: const BorderSide(
+                            color: Color.fromRGBO(190, 186, 179, 1),
+                          )),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: const BorderSide(
+                            color: Color.fromRGBO(190, 186, 179, 1),
+                          )),
+                      contentPadding: EdgeInsets.only(left: 16),
+                      border: InputBorder.none,
+                      hintText: 'Nhập tên ca sĩ',
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -214,25 +263,51 @@ class _UploadSongWidgetState extends State<UploadSongWidget> {
                     )
                   ],
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                DropdownButton(
-                  focusColor: Colors.transparent,
-                  hint: Text('Chon playlist'),
-                  style: TextStyle(color: Colors.red),
-                  value: dropDownValue,
-                  items: state.playList.map((e) {
-                    return DropdownMenuItem(
-                      child: Text(e.title ?? ''),
-                      value: e.title,
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      dropDownValue = value.toString();
-                    });
-                  },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    DropdownButton(
+                      focusColor: Colors.transparent,
+                      hint: Text('Chon album'),
+                      style: TextStyle(color: Colors.red),
+                      value: dropDownValue,
+                      items: state.playList.map((e) {
+                        return DropdownMenuItem(
+                          child: Text(e.title ?? ''),
+                          value: e.title,
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          dropDownValue = value.toString();
+                        });
+                      },
+                    ),
+                    SizedBox(
+                      width: 20,
+                    ),
+                    DropdownButton(
+                      focusColor: Colors.transparent,
+                      hint: Text('Chon thể loại'),
+                      style: TextStyle(color: Colors.red),
+                      value: dropDownValueType,
+                      items: [
+                        DropdownMenuItem(
+                          child: Text('Việt Nam'),
+                          value: 'Việt Nam',
+                        ),
+                        DropdownMenuItem(
+                          child: Text('Quốc Tế'),
+                          value: 'Quốc Tế',
+                        )
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          dropDownValueType = value.toString();
+                        });
+                      },
+                    ),
+                  ],
                 ),
                 GestureDetector(
                   onTap: () async {
@@ -253,8 +328,11 @@ class _UploadSongWidgetState extends State<UploadSongWidget> {
                         for (var i in state.playList) {
                           if (i.title == dropDownValue) {
                             i.songs?.add(Song(
+                              view: 0,
                               title: titleController.text,
                               description: descriptionController.text,
+                              type: dropDownValueType,
+                              artistName: artisController.text,
                               url: audioUrl,
                               coverUrl: imageUrl,
                               dropDownValue: dropDownValue,
@@ -267,7 +345,10 @@ class _UploadSongWidgetState extends State<UploadSongWidget> {
                         FirebaseFirestore.instance.collection('song').doc().set(Song(
                                 title: titleController.text,
                                 coverUrl: imageUrl,
+                                type: dropDownValueType,
+                                artistName: artisController.text,
                                 url: audioUrl,
+                                view: 0,
                                 isTrending: isTrending,
                                 dropDownValue: dropDownValue,
                                 description: descriptionController.text)

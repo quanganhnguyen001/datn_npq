@@ -41,6 +41,8 @@ class UploadSongCubit extends Cubit<UploadSongState> {
             coverUrl: doc['coverUrl'],
             isTrending: doc['isTrending'],
             dropDownValue: doc['dropDownValue'],
+            artistName: doc['artistName'],
+            type: doc['type'],
             songId: doc.id));
       }
 

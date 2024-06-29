@@ -24,9 +24,7 @@ class AdminScreen extends StatelessWidget {
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                  (route) => false);
+              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const LoginScreen()), (route) => false);
             },
             icon: const Icon(Icons.logout_outlined),
           ),
@@ -35,7 +33,7 @@ class AdminScreen extends StatelessWidget {
             labelColor: Colors.green,
             tabs: [
               Tab(
-                child: Text('Danh sách playlist', textAlign: TextAlign.center),
+                child: Text('Danh sách album', textAlign: TextAlign.center),
               ),
               Tab(
                 child: Text(
@@ -55,29 +53,20 @@ class AdminScreen extends StatelessWidget {
           actions: [
             GestureDetector(
               onTap: () {
-                showMenu(
-                    context: context,
-                    position: const RelativeRect.fromLTRB(100, 50, 0, 0),
-                    items: [
-                      PopupMenuItem(
-                          onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    const UploadPlaylistWidget()));
-                          },
-                          child: const Text('Them Playlist')),
-                      PopupMenuItem(
-                          onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    const UploadSongWidget()));
-                          },
-                          child: const Text('Them Bai hat')),
-                    ]);
+                showMenu(context: context, position: const RelativeRect.fromLTRB(100, 50, 0, 0), items: [
+                  PopupMenuItem(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => const UploadPlaylistWidget()));
+                      },
+                      child: const Text('Thêm album')),
+                  PopupMenuItem(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => const UploadSongWidget()));
+                      },
+                      child: const Text('Them Bai hat')),
+                ]);
               },
-              child: Container(
-                  margin: const EdgeInsets.only(right: 20),
-                  child: const Icon(Icons.add)),
+              child: Container(margin: const EdgeInsets.only(right: 20), child: const Icon(Icons.add)),
             ),
           ],
         ),
@@ -96,15 +85,10 @@ class AdminScreen extends StatelessWidget {
                         playlist: state.playList[index],
                         onTap: () {},
                         onPressedEdit: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => UpdatePlaylist(
-                                  playlist: state.playList[index])));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => UpdatePlaylist(playlist: state.playList[index])));
                         },
                         onPressed: () async {
-                          await FirebaseFirestore.instance
-                              .collection('playlist')
-                              .doc(state.playList[index].playlistId)
-                              .delete();
+                          await FirebaseFirestore.instance.collection('playlist').doc(state.playList[index].playlistId).delete();
                         },
                       );
                     }),
@@ -142,15 +126,11 @@ class AdminScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     state.songList[index].title ?? '',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge!
-                                        .copyWith(fontWeight: FontWeight.bold),
+                                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
                                   ),
                                   Text(
                                     '${state.songList[index].description} ',
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall,
+                                    style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                 ],
                               ),
@@ -158,11 +138,10 @@ class AdminScreen extends StatelessWidget {
                             FirebaseAuth.instance.currentUser == null
                                 ? IconButton(
                                     onPressed: () {
-                                      Navigator.of(context)
-                                          .push(MaterialPageRoute(
-                                              builder: (context) => UpdateSong(
-                                                    song: state.songList[index],
-                                                  )));
+                                      Navigator.of(context).push(MaterialPageRoute(
+                                          builder: (context) => UpdateSong(
+                                                song: state.songList[index],
+                                              )));
                                     },
                                     icon: const Icon(
                                       Icons.edit,
@@ -173,10 +152,7 @@ class AdminScreen extends StatelessWidget {
                             FirebaseAuth.instance.currentUser == null
                                 ? IconButton(
                                     onPressed: () async {
-                                      await FirebaseFirestore.instance
-                                          .collection('song')
-                                          .doc(state.songList[index].songId)
-                                          .delete();
+                                      await FirebaseFirestore.instance.collection('song').doc(state.songList[index].songId).delete();
                                     },
                                     icon: const Icon(
                                       Icons.delete,

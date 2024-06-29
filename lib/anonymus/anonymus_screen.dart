@@ -1,3 +1,5 @@
+import 'package:carousel_slider/carousel_options.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:datn_npq/anonymus/playlist_anonymous.dart';
 import 'package:datn_npq/anonymus/playlist_anonymous_widget.dart';
 import 'package:datn_npq/anonymus/song_anonymous.dart';
@@ -9,8 +11,33 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AnonymusScreen extends StatelessWidget {
+class AnonymusScreen extends StatefulWidget {
   const AnonymusScreen({super.key});
+
+  @override
+  State<AnonymusScreen> createState() => _AnonymusScreenState();
+}
+
+class _AnonymusScreenState extends State<AnonymusScreen> {
+  final CarouselController _controller = CarouselController();
+  int _currentIndex = 0;
+  String selectedButton = 'Vietnam';
+  @override
+  void initState() {
+    updateList('Vietnam');
+    super.initState();
+  }
+
+  void updateList(String button) {
+    setState(() {
+      selectedButton = button;
+      if (button == 'Vietnam') {
+        // selectedButton = 'Vietnam';
+      } else if (button == 'Quoc Te') {
+        // selectedButton = 'Quoc Te';
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,25 +143,48 @@ class AnonymusScreen extends StatelessWidget {
                     children: [
                       const Padding(
                         padding: EdgeInsets.only(right: 20.0),
-                        child: SectionHeader(title: ' Thể loại'),
+                        child: SectionHeader(title: ' Album'),
                       ),
                       const SizedBox(height: 20),
                       SizedBox(
                         height: MediaQuery.of(context).size.height * 0.27,
+                        width: MediaQuery.of(context).size.width,
                         child: BlocBuilder<MusicCubit, MusicState>(
                           builder: (context, state) {
-                            return ListView.builder(
-                              scrollDirection: Axis.horizontal,
+                            return CarouselSlider.builder(
+                              carouselController: _controller,
+                              options: CarouselOptions(
+                                viewportFraction: 0.3,
+                                autoPlay: true,
+                                onPageChanged: (index, reason) {
+                                  setState(() {
+                                    _currentIndex = index;
+                                  });
+                                },
+                              ),
                               itemCount: state.playList.length,
-                              itemBuilder: (context, index) {
+                              itemBuilder: (context, index, realIndex) {
                                 return PlaylistAnonymousWidget(
-                                  playlist: state.playList[index],
                                   index: index,
+                                  playlist: state.playList[index],
                                 );
                               },
                             );
                           },
                         ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => _controller.previousPage(),
+                            child: Text('Back'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => _controller.nextPage(),
+                            child: Text('Next'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -188,6 +238,97 @@ class AnonymusScreen extends StatelessWidget {
                                         ),
                                         Text(
                                           state.songList[index].description ?? '',
+                                          maxLines: 2,
+                                          style: Theme.of(context).textTheme.bodySmall,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      SectionHeader(
+                        title: 'Thể loại',
+                        onTap: () {},
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            TextButton(
+                              onPressed: () => updateList('Vietnam'),
+                              style: TextButton.styleFrom(
+                                backgroundColor: selectedButton == 'Vietnam' ? Colors.red : Colors.white,
+                              ),
+                              child: Text('Vietnam'),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            TextButton(
+                              onPressed: () => updateList('Quoc Te'),
+                              style: TextButton.styleFrom(
+                                backgroundColor: selectedButton == 'Quoc Te' ? Colors.red : Colors.white,
+                              ),
+                              child: Text('Quoc Te'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      BlocBuilder<MusicCubit, MusicState>(
+                        builder: (context, state) {
+                          return GridView.builder(
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.only(top: 20),
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3, mainAxisExtent: 150, mainAxisSpacing: 10, crossAxisSpacing: 10),
+                            itemCount: selectedButton == 'Vietnam' ? state.vnList.length : state.interList.length,
+                            itemBuilder: (context, index) {
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => SongAnonymous(
+                                      song: selectedButton == 'Vietnam' ? state.vnList : state.interList,
+                                      index: index,
+                                    ),
+                                  ));
+                                },
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.network(
+                                        selectedButton == 'Vietnam' ? state.vnList[index].coverUrl ?? '' : state.interList[index].coverUrl ?? '',
+                                        height: 100,
+                                        width: 150,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          selectedButton == 'Vietnam' ? state.vnList[index].title ?? '' : state.interList[index].title ?? '',
+                                          style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          selectedButton == 'Vietnam'
+                                              ? state.vnList[index].description ?? ''
+                                              : state.interList[index].description ?? '',
                                           maxLines: 2,
                                           style: Theme.of(context).textTheme.bodySmall,
                                         ),

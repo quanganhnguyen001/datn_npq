@@ -9,7 +9,7 @@ import 'package:datn_npq/screens/admin/admin_screen.dart';
 import 'package:datn_npq/screens/admin/widget/upload_song_widget.dart';
 import 'package:datn_npq/screens/forgot_password_screen.dart';
 import 'package:datn_npq/screens/login_screen.dart';
-import 'package:datn_npq/screens/ranking_song.dart';
+
 import 'package:datn_npq/screens/sign_up_screen.dart';
 
 import 'package:datn_npq/screens/splash_screen.dart';

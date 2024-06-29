@@ -8,11 +8,13 @@ import '../../models/playlist_model.dart';
 part 'music_state.dart';
 
 class MusicCubit extends Cubit<MusicState> {
-  MusicCubit() : super(MusicState([], []));
+  MusicCubit() : super(MusicState([], [], [], []));
 
   fetchData() {
     fetchDataPlaylist();
     fetchDataSonglist();
+    fetchDataInterlist();
+    fetchDataVnlist();
   }
 
   fetchDataPlaylist() {
@@ -40,10 +42,55 @@ class MusicCubit extends Cubit<MusicState> {
             coverUrl: doc['coverUrl'],
             isTrending: doc['isTrending'],
             view: doc['view'],
+            artistName: doc['artistName'],
+            type: doc['type'],
             songId: doc.id));
       }
 
       emit(state.copyWith(songList: songListFetch));
+    });
+  }
+
+  fetchDataVnlist() {
+    FirebaseFirestore.instance.collection('song').where('type', isEqualTo: 'Việt Nam').snapshots().listen((QuerySnapshot snapshot) {
+      List<Song> songListFetchVN = [];
+      for (var doc in snapshot.docs) {
+        songListFetchVN.add(Song(
+            description: doc['description'],
+            title: doc['title'],
+            url: doc['url'],
+            coverUrl: doc['coverUrl'],
+            isTrending: doc['isTrending'],
+            view: doc['view'],
+            artistName: doc['artistName'],
+            type: doc['type'],
+            songId: doc.id));
+      }
+      print('viet nammmmmmmmmm ${songListFetchVN.length}');
+
+      emit(state.copyWith(vnList: songListFetchVN));
+      print(state.vnList[0].title);
+    });
+  }
+
+  fetchDataInterlist() {
+    FirebaseFirestore.instance.collection('song').where('type', isEqualTo: 'Quốc Tế').snapshots().listen((QuerySnapshot snapshot) {
+      List<Song> songListFetchInter = [];
+      for (var doc in snapshot.docs) {
+        songListFetchInter.add(Song(
+            description: doc['description'],
+            title: doc['title'],
+            url: doc['url'],
+            coverUrl: doc['coverUrl'],
+            isTrending: doc['isTrending'],
+            view: doc['view'],
+            artistName: doc['artistName'],
+            type: doc['type'],
+            songId: doc.id));
+      }
+      print('quoc teeeeeeeeeeeee ${songListFetchInter.length}');
+
+      emit(state.copyWith(interList: songListFetchInter));
     });
   }
 }

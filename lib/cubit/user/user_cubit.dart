@@ -9,29 +9,29 @@ import '../../auth/model/user_model.dart';
 part 'user_state.dart';
 
 class UserCubit extends Cubit<UserState> {
-  UserCubit() : super(const UserState(null));
+  UserCubit() : super(const UserState(null, 0));
 
   Future<void> loadUserData() async {
     final user = await _loadUserData();
 
     if (user != null) {
-      emit(UserState(user));
+      emit(UserState(user, 0));
     }
+  }
+
+  changeIndex(int index) {
+    emit(state.copyWith(index: index));
   }
 
   Future<UserModel?> _loadUserData() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (FirebaseAuth.instance.currentUser != null) {
-        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user!.uid)
-            .get();
+        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
         var songs = userSnapshot['favoriteSong'];
         List<Song> favoriteSongs = [];
         if (songs != null) {
-          favoriteSongs = List<Song>.from(songs
-              .map((songMap) => Song.fromMap(songMap as Map<String, dynamic>)));
+          favoriteSongs = List<Song>.from(songs.map((songMap) => Song.fromMap(songMap as Map<String, dynamic>)));
         }
         return UserModel(
           imageUrl: userSnapshot['imageUrl'],

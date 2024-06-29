@@ -20,6 +20,8 @@ class RankingCubit extends Cubit<RankingState> {
             coverUrl: doc['coverUrl'],
             isTrending: doc['isTrending'],
             view: doc['view'],
+            artistName: doc['artistName'],
+            type: doc['type'],
             songId: doc.id));
       }
       rankingSong.sort((a, b) => (b.view?.compareTo((a.view ?? 0))) ?? 0);

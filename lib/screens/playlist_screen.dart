@@ -58,6 +58,9 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
         ),
       ),
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+        ),
         backgroundColor: Colors.transparent,
         body: Stack(
           children: [
@@ -151,36 +154,48 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
                                   ),
                                   subtitle: Text('${state.playList[widget.index].songs?[index1].description}'),
-                                  trailing: GestureDetector(
-                                    onTap: () {
-                                      if (widget.userModel.favoriteSong!
-                                          .any((element) => element.title == state.playList[widget.index].songs?[index1].title)) {
-                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                          content: Text('Da co trong danh sach yeu thich'),
-                                          duration: Duration(seconds: 2),
-                                        ));
-                                      } else {
-                                        (widget.userModel.favoriteSong ?? []).add(Song(
-                                          title: state.playList[widget.index].songs?[index1].title,
-                                          url: state.playList[widget.index].songs?[index1].url,
-                                          coverUrl: state.playList[widget.index].songs?[index1].coverUrl,
-                                          description: state.playList[widget.index].songs?[index1].description,
-                                          songId: state.playList[widget.index].songs?[index1].songId,
-                                        ));
+                                  trailing: SizedBox(
+                                    width: 300,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Icon(Icons.playlist_add),
+                                        SizedBox(
+                                          width: 20,
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (widget.userModel.favoriteSong!
+                                                .any((element) => element.title == state.playList[widget.index].songs?[index1].title)) {
+                                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                                content: Text('Da co trong danh sach yeu thich'),
+                                                duration: Duration(seconds: 2),
+                                              ));
+                                            } else {
+                                              (widget.userModel.favoriteSong ?? []).add(Song(
+                                                title: state.playList[widget.index].songs?[index1].title,
+                                                url: state.playList[widget.index].songs?[index1].url,
+                                                coverUrl: state.playList[widget.index].songs?[index1].coverUrl,
+                                                description: state.playList[widget.index].songs?[index1].description,
+                                                songId: state.playList[widget.index].songs?[index1].songId,
+                                              ));
 
-                                        FirebaseFirestore.instance
-                                            .collection('users')
-                                            .doc(FirebaseAuth.instance.currentUser!.uid)
-                                            .update(UserModel(favoriteSong: (widget.userModel.favoriteSong ?? [])).toMap());
-                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                          content: Text('Them vao danh sach yeu thich thanh cong'),
-                                          duration: Duration(seconds: 2),
-                                        ));
-                                      }
-                                    },
-                                    child: const Icon(
-                                      Icons.add,
-                                      color: Colors.white,
+                                              FirebaseFirestore.instance
+                                                  .collection('users')
+                                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                                  .update(UserModel(favoriteSong: (widget.userModel.favoriteSong ?? [])).toMap());
+                                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                                content: Text('Them vao danh sach yeu thich thanh cong'),
+                                                duration: Duration(seconds: 2),
+                                              ));
+                                            }
+                                          },
+                                          child: const Icon(
+                                            Icons.add,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 );

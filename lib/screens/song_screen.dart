@@ -88,7 +88,6 @@ class _SongScreenState extends State<SongScreen> {
     print(widget.song[widget.index].view);
     return Scaffold(
       appBar: AppBar(
-        leading: Container(),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
