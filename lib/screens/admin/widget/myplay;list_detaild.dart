@@ -1,35 +1,26 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:datn_npq/auth/model/user_model.dart';
 import 'package:datn_npq/cubit/cubit/myuplaylist_cubit_cubit.dart';
-import 'package:datn_npq/cubit/music/music_cubit.dart';
-import 'package:datn_npq/models/my_playlist.dart';
-import 'package:datn_npq/models/song_model.dart';
-
 import 'package:datn_npq/widgets/seekbar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart' as rxdart;
 
-class PlaylistScreen extends StatefulWidget {
-  const PlaylistScreen({
+class MyplaylistDetail extends StatefulWidget {
+  const MyplaylistDetail({
     Key? key,
     required this.index,
     required this.title,
-    required this.userModel,
+    required this.image,
   }) : super(key: key);
   final int index;
   final String title;
-  final UserModel userModel;
+  final String image;
 
   @override
-  State<PlaylistScreen> createState() => _PlaylistScreenState();
+  State<MyplaylistDetail> createState() => _MyplaylistDetailState();
 }
 
-class _PlaylistScreenState extends State<PlaylistScreen> {
+class _MyplaylistDetailState extends State<MyplaylistDetail> {
   AudioPlayer audioPlayer = AudioPlayer();
   int indexPlaying = 0;
   bool hovering = false;
@@ -76,14 +67,16 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                       children: [
                         _PlaylistInformation(
                           index: widget.index,
+                          title: widget.title,
+                          image: widget.image,
                         ),
                         const SizedBox(height: 30),
-                        BlocBuilder<MusicCubit, MusicState>(
+                        BlocBuilder<MyuplaylistCubitCubit, MyuplaylistCubitState>(
                           builder: (context, state) {
                             return ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: state.playList[widget.index].songs?.length,
+                              itemCount: state.myPlayListList[widget.index].myPlaylistSong?.length,
                               itemBuilder: (context, index1) {
                                 return ListTile(
                                   leading: SizedBox(
@@ -111,7 +104,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                           child: Stack(
                                             children: [
                                               Image.network(
-                                                state.playList[widget.index].songs?[index1].coverUrl ?? '',
+                                                state.myPlayListList[widget.index].myPlaylistSong?[index1].coverUrl ?? '',
                                                 fit: BoxFit.cover,
                                               ),
                                               AnimatedOpacity(
@@ -127,7 +120,8 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                                           indexPlaying = index1;
                                                           audioPlayer.setAudioSource(
                                                             ConcatenatingAudioSource(children: [
-                                                              AudioSource.uri(Uri.parse(state.playList[widget.index].songs?[indexPlaying].url ?? ''))
+                                                              AudioSource.uri(Uri.parse(
+                                                                  state.myPlayListList[widget.index].myPlaylistSong?[indexPlaying].url ?? ''))
                                                             ]),
                                                           );
 
@@ -155,129 +149,10 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                     ),
                                   ),
                                   title: Text(
-                                    state.playList[widget.index].songs?[index1].title ?? '',
+                                    state.myPlayListList[widget.index].myPlaylistSong?[index1].title ?? '',
                                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
                                   ),
-                                  subtitle: Text('${state.playList[widget.index].songs?[index1].description}'),
-                                  trailing: SizedBox(
-                                    width: 100,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        GestureDetector(
-                                            onTap: () {
-                                              showModalBottomSheet(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return Padding(
-                                                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                                                      child: Container(
-                                                        height: 500,
-                                                        width: 300,
-                                                        decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(20)),
-                                                        child: Column(
-                                                          children: [
-                                                            SizedBox(
-                                                              height: 20,
-                                                            ),
-                                                            Text(
-                                                              'Danh sach playlist',
-                                                              style: TextStyle(fontSize: 30, color: Colors.red),
-                                                            ),
-                                                            Expanded(
-                                                                child: ListView.builder(
-                                                                    itemCount: context.read<MyuplaylistCubitCubit>().state.myPlayListList.length,
-                                                                    itemBuilder: (context, index) {
-                                                                      final stateMyPlaylist = context.read<MyuplaylistCubitCubit>().state;
-                                                                      return Padding(
-                                                                        padding: const EdgeInsets.only(bottom: 20),
-                                                                        child: GestureDetector(
-                                                                          onTap: () {
-                                                                            if (stateMyPlaylist.myPlayListList.any((element) =>
-                                                                                element.myPlaylistSong?[index].title ==
-                                                                                state.playList[widget.index].songs?[index1].title)) {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                                                                content: Text('Da co trong danh sach playlist'),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ));
-                                                                              Navigator.of(context).pop();
-                                                                            } else {
-                                                                              (stateMyPlaylist.myPlayListList[index].myPlaylistSong ?? []).add(Song(
-                                                                                title: state.playList[widget.index].songs?[index1].title,
-                                                                                url: state.playList[widget.index].songs?[index1].url,
-                                                                                coverUrl: state.playList[widget.index].songs?[index1].coverUrl,
-                                                                                description: state.playList[widget.index].songs?[index1].description,
-                                                                                songId: state.playList[widget.index].songs?[index1].songId,
-                                                                              ));
-
-                                                                              FirebaseFirestore.instance
-                                                                                  .collection('myPlaylist')
-                                                                                  .doc(stateMyPlaylist.myPlayListList[index].myPlaylistId)
-                                                                                  .update(MyPlaylistModel(
-                                                                                          myPlaylistSong:
-                                                                                              (stateMyPlaylist.myPlayListList[index].myPlaylistSong ??
-                                                                                                  []))
-                                                                                      .toMap());
-                                                                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                                                                content: Text('Them vao danh sach playList thanh cong'),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ));
-                                                                              Navigator.of(context).pop();
-                                                                            }
-                                                                          },
-                                                                          child: Text(
-                                                                            context.read<MyuplaylistCubitCubit>().state.myPlayListList[index].name ??
-                                                                                '',
-                                                                            style: TextStyle(fontSize: 20, color: Colors.black),
-                                                                          ),
-                                                                        ),
-                                                                      );
-                                                                    }))
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    );
-                                                  });
-                                            },
-                                            child: Icon(Icons.playlist_add)),
-                                        SizedBox(
-                                          width: 20,
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            if (widget.userModel.favoriteSong!
-                                                .any((element) => element.title == state.playList[widget.index].songs?[index1].title)) {
-                                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                                content: Text('Da co trong danh sach yeu thich'),
-                                                duration: Duration(seconds: 2),
-                                              ));
-                                            } else {
-                                              (widget.userModel.favoriteSong ?? []).add(Song(
-                                                title: state.playList[widget.index].songs?[index1].title,
-                                                url: state.playList[widget.index].songs?[index1].url,
-                                                coverUrl: state.playList[widget.index].songs?[index1].coverUrl,
-                                                description: state.playList[widget.index].songs?[index1].description,
-                                                songId: state.playList[widget.index].songs?[index1].songId,
-                                              ));
-
-                                              FirebaseFirestore.instance
-                                                  .collection('users')
-                                                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                                                  .update(UserModel(favoriteSong: (widget.userModel.favoriteSong ?? [])).toMap());
-                                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                                content: Text('Them vao danh sach yeu thich thanh cong'),
-                                                duration: Duration(seconds: 2),
-                                              ));
-                                            }
-                                          },
-                                          child: const Icon(
-                                            Icons.add,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                  subtitle: Text('${state.myPlayListList[widget.index].myPlaylistSong?[index1].description}'),
                                 );
                               },
                             );
@@ -305,14 +180,14 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                           ],
                         ),
                       ),
-                      child: BlocBuilder<MusicCubit, MusicState>(
+                      child: BlocBuilder<MyuplaylistCubitCubit, MyuplaylistCubitState>(
                         builder: (context, state) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 30),
                             child: Row(
                               children: [
                                 Image.network(
-                                  state.playList[widget.index].songs?[indexPlaying].coverUrl ?? '',
+                                  state.myPlayListList[widget.index].myPlaylistSong?[indexPlaying].coverUrl ?? '',
                                   width: 100,
                                 ),
                                 const SizedBox(
@@ -321,7 +196,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                 Column(
                                   children: [
                                     Text(
-                                      state.playList[widget.index].songs?[indexPlaying].title ?? '',
+                                      state.myPlayListList[widget.index].myPlaylistSong?[indexPlaying].title ?? '',
                                       style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
@@ -329,7 +204,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                     ),
                                     const SizedBox(height: 10),
                                     Text(
-                                      state.playList[widget.index].songs?[indexPlaying].description ?? '',
+                                      state.myPlayListList[widget.index].myPlaylistSong?[indexPlaying].description ?? '',
                                       maxLines: 2,
                                       style: Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.white),
                                     ),
@@ -356,7 +231,8 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                                   }
                                                   audioPlayer.setAudioSource(
                                                     ConcatenatingAudioSource(children: [
-                                                      AudioSource.uri(Uri.parse(state.playList[widget.index].songs?[indexPlaying].url ?? ''))
+                                                      AudioSource.uri(
+                                                          Uri.parse(state.myPlayListList[widget.index].myPlaylistSong?[indexPlaying].url ?? ''))
                                                     ]),
                                                   );
                                                 });
@@ -406,7 +282,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                                 if (isLoading) {
                                                   WidgetsBinding.instance!.addPostFrameCallback((_) {
                                                     setState(() {
-                                                      if (indexPlaying != (state.playList[widget.index].songs?.length ?? 0) - 1) {
+                                                      if (indexPlaying != (state.myPlayListList[widget.index].myPlaylistSong?.length ?? 0) - 1) {
                                                         indexPlaying = indexPlaying + 1;
                                                         isLoading = false;
                                                       } else {
@@ -414,7 +290,8 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                                       }
                                                       audioPlayer.setAudioSource(
                                                         ConcatenatingAudioSource(children: [
-                                                          AudioSource.uri(Uri.parse(state.playList[widget.index].songs?[indexPlaying].url ?? ''))
+                                                          AudioSource.uri(
+                                                              Uri.parse(state.myPlayListList[widget.index].myPlaylistSong?[indexPlaying].url ?? ''))
                                                         ]),
                                                       );
                                                     });
@@ -433,8 +310,8 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                                             audioPlayer.setAudioSource(
                                                               ConcatenatingAudioSource(
                                                                 children: [
-                                                                  AudioSource.uri(
-                                                                      Uri.parse(state.playList[widget.index].songs?[indexPlaying].url ?? '')),
+                                                                  AudioSource.uri(Uri.parse(
+                                                                      state.myPlayListList[widget.index].myPlaylistSong?[indexPlaying].url ?? '')),
                                                                 ],
                                                               ),
                                                             );
@@ -452,14 +329,15 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                             return IconButton(
                                               onPressed: () {
                                                 setState(() {
-                                                  if (indexPlaying != (state.playList[widget.index].songs?.length ?? 0) - 1) {
+                                                  if (indexPlaying != (state.myPlayListList[widget.index].myPlaylistSong?.length ?? 0) - 1) {
                                                     indexPlaying = indexPlaying + 1;
                                                   } else {
                                                     return;
                                                   }
                                                   audioPlayer.setAudioSource(
                                                     ConcatenatingAudioSource(children: [
-                                                      AudioSource.uri(Uri.parse(state.playList[widget.index].songs?[indexPlaying].url ?? ''))
+                                                      AudioSource.uri(
+                                                          Uri.parse(state.myPlayListList[widget.index].myPlaylistSong?[indexPlaying].url ?? ''))
                                                     ]),
                                                   );
                                                 });
@@ -512,19 +390,23 @@ class _PlaylistInformation extends StatelessWidget {
   const _PlaylistInformation({
     Key? key,
     required this.index,
+    required this.title,
+    required this.image,
   }) : super(key: key);
   final int index;
+  final String title;
+  final String image;
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<MusicCubit, MusicState>(
+    return BlocBuilder<MyuplaylistCubitCubit, MyuplaylistCubitState>(
       builder: (context, state) {
         return Column(
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(15.0),
               child: Image.network(
-                state.playList[index].imageUrl ?? '',
+                image,
                 height: MediaQuery.of(context).size.height * 0.3,
                 width: MediaQuery.of(context).size.height * 0.3,
                 fit: BoxFit.cover,
@@ -532,7 +414,7 @@ class _PlaylistInformation extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             Text(
-              state.playList[index].title ?? '',
+              title,
               style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold),
             ),
           ],

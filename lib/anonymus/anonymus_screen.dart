@@ -151,25 +151,27 @@ class _AnonymusScreenState extends State<AnonymusScreen> {
                         width: MediaQuery.of(context).size.width,
                         child: BlocBuilder<MusicCubit, MusicState>(
                           builder: (context, state) {
-                            return CarouselSlider.builder(
-                              carouselController: _controller,
-                              options: CarouselOptions(
-                                viewportFraction: 0.3,
-                                autoPlay: true,
-                                onPageChanged: (index, reason) {
-                                  setState(() {
-                                    _currentIndex = index;
-                                  });
-                                },
-                              ),
-                              itemCount: state.playList.length,
-                              itemBuilder: (context, index, realIndex) {
-                                return PlaylistAnonymousWidget(
-                                  index: index,
-                                  playlist: state.playList[index],
-                                );
-                              },
-                            );
+                            return state.playList.isEmpty
+                                ? Center(child: CircularProgressIndicator())
+                                : CarouselSlider.builder(
+                                    carouselController: _controller,
+                                    options: CarouselOptions(
+                                      viewportFraction: 0.3,
+                                      autoPlay: true,
+                                      onPageChanged: (index, reason) {
+                                        setState(() {
+                                          _currentIndex = index;
+                                        });
+                                      },
+                                    ),
+                                    itemCount: state.playList.length,
+                                    itemBuilder: (context, index, realIndex) {
+                                      return PlaylistAnonymousWidget(
+                                        index: index,
+                                        playlist: state.playList[index],
+                                      );
+                                    },
+                                  );
                           },
                         ),
                       ),

@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:datn_npq/models/my_playlist.dart';
 import 'package:datn_npq/models/song_model.dart';
 import 'package:equatable/equatable.dart';
 
@@ -66,10 +67,8 @@ class MusicCubit extends Cubit<MusicState> {
             type: doc['type'],
             songId: doc.id));
       }
-      print('viet nammmmmmmmmm ${songListFetchVN.length}');
 
       emit(state.copyWith(vnList: songListFetchVN));
-      print(state.vnList[0].title);
     });
   }
 
@@ -88,7 +87,6 @@ class MusicCubit extends Cubit<MusicState> {
             type: doc['type'],
             songId: doc.id));
       }
-      print('quoc teeeeeeeeeeeee ${songListFetchInter.length}');
 
       emit(state.copyWith(interList: songListFetchInter));
     });

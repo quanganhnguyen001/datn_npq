@@ -1,3 +1,4 @@
+import 'package:datn_npq/cubit/cubit/myuplaylist_cubit_cubit.dart';
 import 'package:datn_npq/cubit/forgot_password/forgot_password_cubit.dart';
 import 'package:datn_npq/cubit/login/login_cubit.dart';
 import 'package:datn_npq/cubit/music/music_cubit.dart';
@@ -51,6 +52,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider<ForgotPasswordCubit>(
             create: (context) => ForgotPasswordCubit(),
+          ),
+          BlocProvider<MyuplaylistCubitCubit>(
+            create: (context) => MyuplaylistCubitCubit()..fetchMyPlaylistList(),
           ),
           BlocProvider<UploadSongCubit>(
             create: (context) => UploadSongCubit()..fetchData(),

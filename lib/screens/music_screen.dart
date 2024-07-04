@@ -8,6 +8,7 @@ import 'package:datn_npq/screens/profile_screen.dart';
 
 import 'package:datn_npq/screens/song_screen.dart';
 import 'package:datn_npq/widgets/favorite_widget.dart';
+import 'package:datn_npq/widgets/my_playlist_widget.dart';
 import 'package:datn_npq/widgets/profile_widget.dart';
 import 'package:datn_npq/widgets/ranking_widget.dart';
 
@@ -77,7 +78,7 @@ class _MusicScreenState extends State<MusicScreen> {
               child: FavoriteWidget(
                 userModel: widget.user,
               )),
-          Container(),
+          Expanded(flex: 8, child: MyPlaylistWidget()),
           Expanded(
             flex: 8,
             child: ProfileWidget(
@@ -114,7 +115,10 @@ class _MusicScreenState extends State<MusicScreen> {
                             onTap: () {
                               context.read<UserCubit>().changeIndex(0);
                             },
-                            child: Text('Trang chủ')),
+                            child: Text(
+                              'Trang chủ',
+                              style: TextStyle(color: state.index == 0 ? Colors.red : Colors.white),
+                            )),
                         SizedBox(
                           height: 10,
                         ),
@@ -122,14 +126,12 @@ class _MusicScreenState extends State<MusicScreen> {
                             onTap: () {
                               context.read<UserCubit>().changeIndex(1);
                             },
-                            child: Text('Bảng xếp hạng')),
+                            child: Text('Bảng xếp hạng', style: TextStyle(color: state.index == 1 ? Colors.red : Colors.white))),
                         SizedBox(
                           height: 10,
                         ),
-                        Text(
-                          'Danh sách nghe gần đây',
-                          textAlign: TextAlign.center,
-                        ),
+                        Text('Danh sách nghe gần đây',
+                            textAlign: TextAlign.center, style: TextStyle(color: state.index == 2 ? Colors.red : Colors.white)),
                         SizedBox(
                           height: 10,
                         ),
@@ -137,11 +139,15 @@ class _MusicScreenState extends State<MusicScreen> {
                             onTap: () {
                               context.read<UserCubit>().changeIndex(3);
                             },
-                            child: Text('Bài hát yêu thích')),
+                            child: Text('Bài hát yêu thích', style: TextStyle(color: state.index == 3 ? Colors.red : Colors.white))),
                         SizedBox(
                           height: 10,
                         ),
-                        Text('Playlist'),
+                        GestureDetector(
+                            onTap: () {
+                              context.read<UserCubit>().changeIndex(4);
+                            },
+                            child: Text('Playlist', style: TextStyle(color: state.index == 4 ? Colors.red : Colors.white))),
                         SizedBox(
                           height: 10,
                         ),
@@ -149,7 +155,7 @@ class _MusicScreenState extends State<MusicScreen> {
                             onTap: () {
                               context.read<UserCubit>().changeIndex(5);
                             },
-                            child: Text('Thông tin cá nhân')),
+                            child: Text('Thông tin cá nhân', style: TextStyle(color: state.index == 5 ? Colors.red : Colors.white))),
                       ],
                     ),
                   ),
@@ -287,26 +293,30 @@ class _MusicScreenState extends State<MusicScreen> {
                     width: MediaQuery.of(context).size.width,
                     child: BlocBuilder<MusicCubit, MusicState>(
                       builder: (context, state) {
-                        return CarouselSlider.builder(
-                          carouselController: _controller,
-                          options: CarouselOptions(
-                            viewportFraction: 0.3,
-                            autoPlay: true,
-                            onPageChanged: (index, reason) {
-                              setState(() {
-                                _currentIndex = index;
-                              });
-                            },
-                          ),
-                          itemCount: state.playList.length,
-                          itemBuilder: (context, index, realIndex) {
-                            return PlaylistWidget(
-                              playlist: state.playList[index],
-                              user: widget.user,
-                              index: index,
-                            );
-                          },
-                        );
+                        return state.playList.isEmpty
+                            ? Center(
+                                child: CircularProgressIndicator(),
+                              )
+                            : CarouselSlider.builder(
+                                carouselController: _controller,
+                                options: CarouselOptions(
+                                  viewportFraction: 0.3,
+                                  autoPlay: true,
+                                  onPageChanged: (index, reason) {
+                                    setState(() {
+                                      _currentIndex = index;
+                                    });
+                                  },
+                                ),
+                                itemCount: state.playList.length,
+                                itemBuilder: (context, index, realIndex) {
+                                  return PlaylistWidget(
+                                    playlist: state.playList[index],
+                                    user: widget.user,
+                                    index: index,
+                                  );
+                                },
+                              );
                       },
                     ),
                   ),
