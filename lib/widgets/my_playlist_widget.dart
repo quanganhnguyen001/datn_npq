@@ -146,14 +146,19 @@ class _MyPlaylistWidgetState extends State<MyPlaylistWidget> {
                                 Container(
                                   width: 300,
                                   height: 200,
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        image: NetworkImage(
-                                          state.myPlayListList[index].myPlaylistSong?.first.coverUrl ?? '',
+                                  decoration: (state.myPlayListList[index].myPlaylistSong?.isEmpty ?? false)
+                                      ? BoxDecoration(
+                                          color: Colors.grey,
+                                          borderRadius: BorderRadius.circular(15),
+                                        )
+                                      : BoxDecoration(
+                                          image: DecorationImage(
+                                              image: NetworkImage(
+                                                state.myPlayListList[index].myPlaylistSong?.first.coverUrl ?? '',
+                                              ),
+                                              fit: BoxFit.cover),
+                                          borderRadius: BorderRadius.circular(15),
                                         ),
-                                        fit: BoxFit.cover),
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
                                 ),
                                 Container(
                                   width: 300,
