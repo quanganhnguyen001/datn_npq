@@ -11,19 +11,20 @@ class Song {
   final int? view;
   final String? artistName;
   final String? type;
+  final bool? isExist;
 
-  Song({
-    this.title,
-    this.description,
-    this.url,
-    this.coverUrl,
-    this.songId,
-    this.isTrending,
-    this.dropDownValue,
-    this.view,
-    this.artistName,
-    this.type,
-  });
+  Song(
+      {this.title,
+      this.description,
+      this.url,
+      this.coverUrl,
+      this.songId,
+      this.isTrending,
+      this.dropDownValue,
+      this.view,
+      this.artistName,
+      this.type,
+      this.isExist});
 
   Map<String, dynamic> toMap() {
     final result = <String, dynamic>{};
@@ -58,6 +59,9 @@ class Song {
     if (type != null) {
       result.addAll({'type': type});
     }
+    if (isExist != null) {
+      result.addAll({'isExist': isExist});
+    }
 
     return result;
   }
@@ -74,6 +78,7 @@ class Song {
       view: map['view']?.toInt(),
       artistName: map['artistName'],
       type: map['type'],
+      isExist: map['isExist'],
     );
   }
 

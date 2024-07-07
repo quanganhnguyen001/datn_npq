@@ -34,7 +34,10 @@ class RankingWidget extends StatelessWidget {
                           const SizedBox(
                             width: 15,
                           ),
-                          Image.network(state.rankingList[index].coverUrl ?? ''),
+                          Image.network(
+                            state.rankingList[index].coverUrl ?? '',
+                            width: 75,
+                          ),
                         ],
                       ),
                     ),

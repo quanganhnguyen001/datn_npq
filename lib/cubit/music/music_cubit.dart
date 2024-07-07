@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:datn_npq/models/history_model.dart';
 import 'package:datn_npq/models/my_playlist.dart';
 import 'package:datn_npq/models/song_model.dart';
 import 'package:equatable/equatable.dart';
@@ -9,13 +10,14 @@ import '../../models/playlist_model.dart';
 part 'music_state.dart';
 
 class MusicCubit extends Cubit<MusicState> {
-  MusicCubit() : super(MusicState([], [], [], []));
+  MusicCubit() : super(MusicState([], [], [], [], []));
 
   fetchData() {
     fetchDataPlaylist();
     fetchDataSonglist();
     fetchDataInterlist();
     fetchDataVnlist();
+    fetchDataHistorylist();
   }
 
   fetchDataPlaylist() {
@@ -89,6 +91,23 @@ class MusicCubit extends Cubit<MusicState> {
       }
 
       emit(state.copyWith(interList: songListFetchInter));
+    });
+  }
+
+  fetchDataHistorylist() {
+    FirebaseFirestore.instance.collection('history').snapshots().listen((QuerySnapshot snapshot) {
+      List<Song> historyListFetch = [];
+      for (var doc in snapshot.docs) {
+        historyListFetch.add(Song(
+            description: doc['description'],
+            title: doc['title'],
+            url: doc['url'],
+            coverUrl: doc['coverUrl'],
+            songId: doc.id,
+            isExist: doc['isExist']));
+      }
+
+      emit(state.copyWith(historyList: historyListFetch));
     });
   }
 }

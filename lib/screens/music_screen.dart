@@ -1,8 +1,10 @@
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:datn_npq/auth/model/user_model.dart';
 import 'package:datn_npq/cubit/music/music_cubit.dart';
 import 'package:datn_npq/models/song_model.dart';
+import 'package:datn_npq/screens/admin/widget/history_widget.dart';
 import 'package:datn_npq/screens/favorite_screen.dart';
 import 'package:datn_npq/screens/profile_screen.dart';
 
@@ -72,7 +74,7 @@ class _MusicScreenState extends State<MusicScreen> {
         final List<Widget> page = [
           _homeWidget(),
           Expanded(flex: 8, child: RankingWidget()),
-          Container(),
+          Expanded(flex: 8, child: HistoryScreen()),
           Expanded(
               flex: 8,
               child: FavoriteWidget(
@@ -130,8 +132,13 @@ class _MusicScreenState extends State<MusicScreen> {
                         SizedBox(
                           height: 10,
                         ),
-                        Text('Danh sách nghe gần đây',
-                            textAlign: TextAlign.center, style: TextStyle(color: state.index == 2 ? Colors.red : Colors.white)),
+                        GestureDetector(
+                          onTap: () {
+                            context.read<UserCubit>().changeIndex(2);
+                          },
+                          child: Text('Danh sách nghe gần đây',
+                              textAlign: TextAlign.center, style: TextStyle(color: state.index == 2 ? Colors.red : Colors.white)),
+                        ),
                         SizedBox(
                           height: 10,
                         ),
@@ -355,7 +362,31 @@ class _MusicScreenState extends State<MusicScreen> {
                         itemCount: state.songList.length < 12 ? state.songList.length : 12,
                         itemBuilder: (context, index) {
                           return InkWell(
-                            onTap: () {
+                            onTap: () async {
+                              final song = state.songList[index];
+                              final collectionRef = FirebaseFirestore.instance.collection('history');
+
+                              // Tìm bài hát có cùng songId
+                              final querySnapshot = await collectionRef.where('songId', isEqualTo: song.songId).get();
+
+                              // Nếu bài hát đã tồn tại, xóa nó
+                              if (querySnapshot.docs.isNotEmpty) {
+                                for (var doc in querySnapshot.docs) {
+                                  await doc.reference.delete();
+                                }
+                              }
+
+                              // Thêm bài hát mới vào Firestore
+                              await collectionRef.doc().set(Song(
+                                    title: song.title,
+                                    url: song.url,
+                                    isExist: false,
+                                    coverUrl: song.coverUrl,
+                                    description: song.description,
+                                    songId: song.songId,
+                                  ).toMap());
+
+                              // Điều hướng đến SongScreen
                               Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => SongScreen(
                                   song: state.songList,
@@ -444,7 +475,29 @@ class _MusicScreenState extends State<MusicScreen> {
                         itemCount: selectedButton == 'Vietnam' ? state.vnList.length : state.interList.length,
                         itemBuilder: (context, index) {
                           return InkWell(
-                            onTap: () {
+                            onTap: () async {
+                              final song = selectedButton == 'Vietnam' ? state.vnList[index] : state.interList[index];
+                              final collectionRef = FirebaseFirestore.instance.collection('history');
+
+                              // Tìm bài hát có cùng songId
+                              final querySnapshot = await collectionRef.where('songId', isEqualTo: song.songId).get();
+
+                              // Nếu bài hát đã tồn tại, xóa nó
+                              if (querySnapshot.docs.isNotEmpty) {
+                                for (var doc in querySnapshot.docs) {
+                                  await doc.reference.delete();
+                                }
+                              }
+
+                              // Thêm bài hát mới vào Firestore
+                              await collectionRef.doc().set(Song(
+                                    title: song.title,
+                                    url: song.url,
+                                    isExist: false,
+                                    coverUrl: song.coverUrl,
+                                    description: song.description,
+                                    songId: song.songId,
+                                  ).toMap());
                               Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => SongScreen(
                                   song: selectedButton == 'Vietnam' ? state.vnList : state.interList,
