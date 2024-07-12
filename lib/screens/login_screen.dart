@@ -1,12 +1,19 @@
+import 'dart:io';
+
 import 'package:datn_npq/auth/base_screen.dart';
+import 'package:datn_npq/auth/model/user_model.dart';
 import 'package:datn_npq/cubit/login/login_cubit.dart';
+import 'package:datn_npq/gg_services.dart';
 import 'package:datn_npq/screens/admin/admin_screen.dart';
 import 'package:datn_npq/screens/forgot_password_screen.dart';
+import 'package:datn_npq/screens/music_screen.dart';
 import 'package:datn_npq/screens/sign_up_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +23,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final GoogleSignInService _signInService = GoogleSignInService();
+
   final formKey = GlobalKey<FormState>();
   bool isShow = true;
   @override
@@ -40,10 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Center(
                     child: Text(
                       'Dang nhap',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold),
                     ),
                   ),
                   SizedBox(
@@ -55,9 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: context.read<LoginCubit>().emailController,
                       style: TextStyle(color: Colors.white),
                       validator: (value) {
-                        if (!RegExp(
-                                r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
-                            .hasMatch(value ?? 'Email không hợp lệ')) {
+                        if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value ?? 'Email không hợp lệ')) {
                           return 'Vui lòng nhập email';
                         }
 
@@ -105,8 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(color: Colors.white),
                       obscureText: isShow,
                       validator: (value) {
-                        if (!RegExp(r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$")
-                            .hasMatch(value ?? 'Mật khẩu không hợp lệ')) {
+                        if (!RegExp(r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$").hasMatch(value ?? 'Mật khẩu không hợp lệ')) {
                           return 'Vui lòng nhập mật khẩu';
                         }
 
@@ -144,10 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 isShow = !isShow;
                               });
                             },
-                            child: isShow == false
-                                ? Image.asset('assets/images/password_show.png')
-                                : Image.asset(
-                                    'assets/images/password_hide.png'),
+                            child: isShow == false ? Image.asset('assets/images/password_show.png') : Image.asset('assets/images/password_hide.png'),
                           ),
                           contentPadding: EdgeInsets.only(left: 16, top: 10),
                           border: InputBorder.none,
@@ -162,29 +162,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 400),
                     child: Container(
                       width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                          color: Colors.purple,
-                          borderRadius: BorderRadius.circular(25)),
+                      decoration: BoxDecoration(color: Colors.purple, borderRadius: BorderRadius.circular(25)),
                       child: GestureDetector(
                           onTap: () {
                             if (formKey.currentState!.validate()) {
                               context.read<LoginCubit>().login(
                                     ctx: context,
                                   );
-                            } else if (context
-                                        .read<LoginCubit>()
-                                        .emailController
-                                        .text ==
-                                    'admin' &&
-                                context
-                                        .read<LoginCubit>()
-                                        .passwordController
-                                        .text ==
-                                    'admin') {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (context) => AdminScreen()),
-                                  (route) => false);
+                            } else if (context.read<LoginCubit>().emailController.text == 'admin' &&
+                                context.read<LoginCubit>().passwordController.text == 'admin') {
+                              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => AdminScreen()), (route) => false);
                               // Navigator.of(context).pushNamedAndRemoveUntil(
                               //     AdminScreen.routeName, (route) => false);
                             }
@@ -201,10 +188,43 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     height: 20,
                   ),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 223, 255, 187),
+                      shape: const StadiumBorder(),
+                      elevation: 1,
+                    ),
+                    onPressed: () async {
+                      final account = await _signInService.signIn();
+
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => MusicScreen(
+                              user: UserModel(name: 'Quan', imageUrl: account?.photoUrl, email: account?.email, phone: '', favoriteSong: []))));
+                      // Handle successful sign-in
+                    },
+                    icon: Image.asset(
+                      'assets/images/google.png',
+                      height: 50,
+                    ),
+                    label: RichText(
+                      text: const TextSpan(
+                        style: TextStyle(color: Colors.black, fontSize: 16),
+                        children: [
+                          TextSpan(text: 'Sign In with '),
+                          TextSpan(
+                            text: 'Google',
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => ForgotPasswordScreen()));
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => ForgotPasswordScreen()));
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 400),
@@ -213,9 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           Text(
                             'Quên mật khẩu',
-                            style: TextStyle(
-                                color: Colors.blue,
-                                fontWeight: FontWeight.bold),
+                            style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -230,8 +248,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Text('Chưa có tài khoản ? '),
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => SignupScreen()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignupScreen()));
                         },
                         child: Text(
                           'Đăng ký',

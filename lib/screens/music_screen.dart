@@ -5,7 +5,7 @@ import 'package:datn_npq/auth/model/user_model.dart';
 import 'package:datn_npq/cubit/music/music_cubit.dart';
 import 'package:datn_npq/models/song_model.dart';
 import 'package:datn_npq/screens/admin/widget/history_widget.dart';
-import 'package:datn_npq/screens/favorite_screen.dart';
+
 import 'package:datn_npq/screens/profile_screen.dart';
 
 import 'package:datn_npq/screens/song_screen.dart';
