@@ -19,7 +19,7 @@ class AdminScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -38,6 +38,12 @@ class AdminScreen extends StatelessWidget {
               Tab(
                 child: Text(
                   'Danh sách bai hat',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Tab(
+                child: Text(
+                  'Danh sách user',
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -165,7 +171,71 @@ class AdminScreen extends StatelessWidget {
                       );
                     },
                   ),
-                )
+                ),
+                Container(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.only(top: 20),
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: state.listUser.length,
+                    itemBuilder: ((context, index) {
+                      return Container(
+                        height: 75,
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple.shade800.withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        child: ListTile(
+                            title: Text(
+                              state.listUser[index].name ?? '',
+                              style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            leading: SizedBox(
+                              width: 110,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    '${index + 1}',
+                                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(
+                                    width: 15,
+                                  ),
+                                  Image.network(
+                                    state.listUser[index].imageUrl ?? '',
+                                    width: 75,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            subtitle: Text(state.listUser[index].email ?? ''),
+                            trailing: SizedBox(
+                              width: 200,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                    state.listUser[index].phone ?? '',
+                                    style: TextStyle(fontSize: 25, color: Colors.white),
+                                  ),
+                                  IconButton(
+                                    onPressed: () async {
+                                      await FirebaseFirestore.instance.collection('users').doc(state.listUser[index].uid).delete();
+                                    },
+                                    icon: Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )),
+                      );
+                    }),
+                  ),
+                ),
               ],
             );
           },

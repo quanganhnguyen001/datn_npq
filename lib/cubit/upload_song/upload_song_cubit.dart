@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:datn_npq/auth/model/user_model.dart';
 import 'package:datn_npq/models/playlist_model.dart';
 import 'package:equatable/equatable.dart';
 
@@ -8,11 +9,12 @@ import '../../models/song_model.dart';
 part 'upload_song_state.dart';
 
 class UploadSongCubit extends Cubit<UploadSongState> {
-  UploadSongCubit() : super(UploadSongState([], []));
+  UploadSongCubit() : super(UploadSongState([], [], []));
 
   fetchData() {
     fetchDataPlaylist();
     fetchDataSonglist();
+    fetchListUser();
   }
 
   fetchDataPlaylist() {
@@ -47,6 +49,17 @@ class UploadSongCubit extends Cubit<UploadSongState> {
       }
 
       emit(state.copyWith(songList: songListFetch));
+    });
+  }
+
+  fetchListUser() {
+    FirebaseFirestore.instance.collection('users').snapshots().listen((QuerySnapshot snapshot) {
+      List<UserModel> listUserFetch = [];
+      for (var doc in snapshot.docs) {
+        listUserFetch.add(UserModel(uid: doc.id, name: doc['name'], email: doc['email'], imageUrl: doc['imageUrl'], phone: doc['phone']));
+      }
+
+      emit(state.copyWith(listUser: listUserFetch));
     });
   }
 }
